@@ -89,10 +89,9 @@ internal class MarkdownApplier(private val root: MarkdownNode.Root) : Applier<Ma
     }
   }
 
-  private fun notSupportedOperation(operation: String): Nothing {
+  private fun notSupportedOperation(operation: String): Nothing =
     throw NotImplementedError(
       "Operation $operation is not supported. Dynamic layouts are not currently " +
         "supported. (Did you try recomposition?)",
     )
-  }
 }

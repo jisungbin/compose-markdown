@@ -31,4 +31,3 @@ dependencyResolutionManagement {
 }
 
 include(":markdown-runtime")
- 
