@@ -12,11 +12,12 @@ import assertk.assertFailure
 import assertk.assertThat
 import assertk.assertions.containsExactly
 import assertk.assertions.hasMessage
+import assertk.assertions.isEmpty
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlinx.coroutines.test.runTest
-import land.sungbin.markdown.runtime.node.EmptyUpdater
 import land.sungbin.markdown.runtime.node.Column
+import land.sungbin.markdown.runtime.node.EmptyUpdater
 import land.sungbin.markdown.runtime.node.SimpleMarkdownRoot
 import land.sungbin.markdown.runtime.node.Text
 import okio.Buffer
@@ -60,6 +61,11 @@ class MarkdownApplierTest {
     )
   }
 
+  @Test fun blackholeColumn() = runTest {
+    buffer.markdown { Column {} }
+    assertThat(buffer.readUtf8()).isEmpty()
+  }
+
   @Test fun mixedTexts() = runTest {
     buffer.markdown {
       repeat(3) { index ->
@@ -70,6 +76,7 @@ class MarkdownApplierTest {
           Text("[#$index] Bye World!")
         }
       }
+      Column {}
     }
     assertThat(buffer.readUtf8().lines()).containsExactly(
       "[#0] Hello World!",
@@ -83,6 +90,8 @@ class MarkdownApplierTest {
       "[#1] Bye World!",
       "<br/>",
       "[#2] Bye World!",
+      "",
+      "",
     )
   }
 

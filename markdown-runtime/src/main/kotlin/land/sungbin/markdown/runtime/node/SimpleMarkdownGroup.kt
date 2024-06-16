@@ -18,7 +18,8 @@ import land.sungbin.markdown.runtime.okio.blackholeSource
 import okio.Buffer
 import okio.Source
 
-public class SimpleMarkdownGroup private constructor() : MarkdownNode.Group {
+@PublishedApi
+internal class SimpleMarkdownGroup private constructor() : MarkdownNode.Group {
   private var texts = arrayOfNulls<MarkdownNode.Text>(10)
   private var maxIndex = -1
 
@@ -56,12 +57,14 @@ public class SimpleMarkdownGroup private constructor() : MarkdownNode.Group {
 
   private fun ensureCapacity(size: Int) {
     if (texts.size < size) {
-      texts = texts.copyOf(size)
+      texts = texts.copyOf(size + 10)
     }
   }
 
-  public companion object {
-    public val Constructor: () -> MarkdownNode = ::SimpleMarkdownGroup
+  @PublishedApi
+  internal companion object {
+    @PublishedApi
+    internal val Constructor: () -> MarkdownNode = ::SimpleMarkdownGroup
   }
 }
 
