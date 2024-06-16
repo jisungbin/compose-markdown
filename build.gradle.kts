@@ -6,11 +6,14 @@
  */
 
 import com.diffplug.gradle.spotless.SpotlessExtension
+import org.jetbrains.dokka.DokkaConfiguration.Visibility
+import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
   alias(libs.plugins.spotless) apply false
+  alias(libs.plugins.kotlin.dokka) apply false
   alias(libs.plugins.gradle.publish.maven) apply false
 }
 
@@ -21,11 +24,16 @@ buildscript {
 }
 
 subprojects {
-  group = project.property("GROUP") as String
-  version = project.property("VERSION_NAME") as String
+  if (project.hasProperty("GROUP") && project.hasProperty("VERSION_NAME")) {
+    group = project.property("GROUP") as String
+    version = project.property("VERSION_NAME") as String
+  }
 
   apply {
     plugin(rootProject.libs.plugins.spotless.get().pluginId)
+    if (pluginManager.hasPlugin(rootProject.libs.plugins.gradle.publish.maven.get().pluginId)) {
+      plugin(rootProject.libs.plugins.kotlin.dokka.get().pluginId)
+    }
   }
 
   extensions.configure<SpotlessExtension> {
@@ -77,9 +85,32 @@ subprojects {
     }
   }
 
-  tasks.withType<Test>().configureEach {
+  tasks.withType<Test> {
     useJUnitPlatform()
     outputs.upToDateWhen { false }
+  }
+
+  afterEvaluate {
+    if (pluginManager.hasPlugin(rootProject.libs.plugins.kotlin.dokka.get().pluginId)) {
+      val artifact = name.substringAfter('-')
+      tasks.withType<DokkaTask>().configureEach {
+        moduleName.set("Compose-Markdown ${artifact.replaceFirstChar(Char::uppercase)} API")
+        moduleVersion.set(project.property("VERSION_NAME") as String)
+        outputDirectory.set(rootDir.resolve("documentation/site/$artifact/api"))
+
+        dokkaSourceSets.configureEach {
+          jdkVersion.set(17)
+          documentedVisibilities.set(setOf(Visibility.PUBLIC, Visibility.PROTECTED))
+        }
+
+        pluginsMapConfiguration.set(
+          mapOf(
+            "org.jetbrains.dokka.base.DokkaBase" to
+              """{ "footerMessage": "compose-markdown ⓒ 2024 Ji Sungbin" }""",
+          )
+        )
+      }
+    }
   }
 }
 

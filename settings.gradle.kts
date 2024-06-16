@@ -27,14 +27,8 @@ dependencyResolutionManagement {
   repositories {
     google()
     mavenCentral()
-    maven("https://androidx.dev/snapshots/builds/11964836/artifacts/repository") {
-      mavenContent {
-        includeModuleByRegex("androidx\\.compose\\.runtime", "runtime-test-utils.*")
-        snapshotsOnly()
-      }
-    }
   }
 }
 
-include(":compose-markdown")
+include(":markdown-runtime")
  
