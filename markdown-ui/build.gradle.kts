@@ -1,4 +1,4 @@
- /*
+/*
  * Developed by Ji Sungbin 2024.
  *
  * Licensed under the MIT.
@@ -15,10 +15,11 @@ kotlin {
 }
 
 dependencies {
-  implementation(libs.androidx.annotation)
   implementation(libs.compose.runtime)
+  implementation(libs.compose.uiutil)
+  implementation(libs.androidx.annotation)
 
-  api(libs.okio)
+  implementation(projects.markdownRuntime)
 
   testImplementation(kotlin("test-junit5"))
   testImplementation(libs.test.assertk)
