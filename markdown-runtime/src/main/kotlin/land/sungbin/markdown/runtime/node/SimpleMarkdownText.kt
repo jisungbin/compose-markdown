@@ -16,8 +16,9 @@ import land.sungbin.markdown.runtime.MarkdownOptions
 import okio.Buffer
 import okio.Source
 
+@PublishedApi
 @JvmInline
-public value class SimpleMarkdownText @PublishedApi internal constructor(private val text: String) : MarkdownNode.Text {
+internal value class SimpleMarkdownText(private val text: String) : MarkdownNode.Text {
   override fun render(options: MarkdownOptions): Source = Buffer().writeUtf8(text)
   override fun toString(): String = text
 }

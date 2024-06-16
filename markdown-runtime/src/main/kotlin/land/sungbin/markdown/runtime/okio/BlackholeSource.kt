@@ -12,7 +12,7 @@ import okio.Source
 import okio.Timeout
 
 /** Returns a [Source] that reads nowhere. */
-public fun blackholeSource(): Source = BlackholeSource
+internal fun blackholeSource(): Source = BlackholeSource
 
 private object BlackholeSource : Source {
   override fun read(sink: Buffer, byteCount: Long): Long = -1L
