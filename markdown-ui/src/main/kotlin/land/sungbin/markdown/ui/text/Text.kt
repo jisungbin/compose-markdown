@@ -36,7 +36,7 @@ private class MarkdownText(
 @[Composable NonRestartableComposable MarkdownComposable]
 public fun Text(value: CharSequence, modifier: Modifier = Modifier) {
   val sink = { options: MarkdownOptions ->
-    if (value is AbstractText) value.apply { lazyWriting(options) }.buffer.clone()
+    if (value is AbstractText) value.lazyWriting(options).buffer.clone()
     else bufferOf(value)
   }
 

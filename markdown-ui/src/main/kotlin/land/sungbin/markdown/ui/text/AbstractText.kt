@@ -7,6 +7,7 @@ import land.sungbin.markdown.runtime.MarkdownOptions
 import okio.Buffer
 import okio.BufferedSink
 import okio.BufferedSource
+import okio.ByteString
 
 @Stable
 public abstract class AbstractText internal constructor() : CharSequence {
@@ -24,10 +25,21 @@ public abstract class AbstractText internal constructor() : CharSequence {
   internal open fun lazyWriting(options: MarkdownOptions): AbstractText = this
 
   final override fun subSequence(startIndex: Int, endIndex: Int): CharSequence =
-    buffer.snapshot().substring(startIndex, endIndex).utf8()
+    buffer.snapshot().substring(startIndex, endIndex).asCharSequence()
 
   override fun toString(): String = buffer.snapshot().utf8()
 
   override fun hashCode(): Int = buffer.hashCode()
   override fun equals(other: Any?): Boolean = buffer == other
+
+  private fun ByteString.asCharSequence(): CharSequence = object : CharSequence {
+    override val length: Int get() = this@asCharSequence.size
+
+    override fun get(index: Int): Char = this@asCharSequence[index].toInt().toChar()
+
+    override fun subSequence(startIndex: Int, endIndex: Int): CharSequence =
+      this@asCharSequence.substring(startIndex, endIndex).asCharSequence()
+
+    override fun toString(): String = this@asCharSequence.utf8()
+  }
 }
