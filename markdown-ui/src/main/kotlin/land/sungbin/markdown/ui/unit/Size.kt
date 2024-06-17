@@ -37,7 +37,7 @@ public class FixedSize(width: Int, height: Int) : Size {
   override fun toString(): String = "FixedSize(width='$width', height='$height')"
 }
 
-public class PercentSize(width: Float, height: Float) : Size {
+public class Percentage(width: Float, height: Float) : Size {
   public override val width: String = "${width.roundToInt()}%"
   public override val height: String = "${height.roundToInt()}%"
 
@@ -45,7 +45,7 @@ public class PercentSize(width: Float, height: Float) : Size {
     if (this === other) return true
     if (javaClass != other?.javaClass) return false
 
-    other as PercentSize
+    other as Percentage
 
     if (width != other.width) return false
     if (height != other.height) return false

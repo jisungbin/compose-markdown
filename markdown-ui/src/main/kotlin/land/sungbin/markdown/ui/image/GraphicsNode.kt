@@ -1,7 +1,6 @@
 package land.sungbin.markdown.ui.image
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import androidx.compose.runtime.Immutable
 import kotlinx.coroutines.launch
 import land.sungbin.markdown.runtime.MarkdownNode
 import land.sungbin.markdown.runtime.MarkdownOptions
@@ -11,19 +10,22 @@ import okio.FileSystem
 import okio.Path
 import okio.Source
 
+@Immutable
 public class GraphicsNode(
-  private val size: Size?,
-  private val alt: String?,
   private val resolver: Resolver,
-  private val scope: CoroutineScope,
+  private val size: Size? = null,
+  private val alt: String? = null,
 ) : MarkdownNode.Text {
+  @Immutable
   public class Image(public val path: Path, public val bytes: ByteArray)
 
   override fun render(options: MarkdownOptions): Source {
     val image = resolver.resolve(options.defaultImageStorage)
 
-    scope.launch(Dispatchers.IO) {
-      FileSystem.SYSTEM.write(image.path) { write(image.bytes) }
+    if (!FileSystem.SYSTEM.exists(image.path)) {
+      options.scope.launch {
+        FileSystem.SYSTEM.write(image.path, mustCreate = true) { write(image.bytes) }
+      }
     }
 
     return Buffer().apply {
@@ -38,6 +40,7 @@ public class GraphicsNode(
     }
   }
 
+  @Immutable
   public fun interface Resolver {
     public fun resolve(defaultImageStorage: Path?): Image
   }

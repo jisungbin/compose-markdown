@@ -11,16 +11,14 @@ import androidx.compose.runtime.Applier
 import androidx.compose.runtime.collection.MutableVector
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
-import land.sungbin.markdown.runtime.node.SimpleMarkdownRoot
 import okio.Buffer
 
-@PublishedApi
-internal class MarkdownApplier(private val root: MarkdownNode.Root) : Applier<MarkdownNode> {
+public class MarkdownApplier internal constructor(private val root: MarkdownNode.Root) : Applier<MarkdownNode> {
   private val stack = MutableVector<MarkdownNode>(capacity = 10).apply { add(root) }
   override var current: MarkdownNode = root
 
-  constructor(options: MarkdownOptions, buffer: Buffer) :
-    this(root = SimpleMarkdownRoot(options = options, buffer = buffer))
+  public constructor(options: MarkdownOptions, buffer: Buffer) :
+    this(root = MarkdownLayoutNode(options = options, buffer = buffer))
 
   override fun insertTopDown(index: Int, instance: MarkdownNode) {
     assertNotNestedRoot(instance)

@@ -19,6 +19,7 @@ dependencies {
   implementation(libs.compose.runtime)
 
   api(libs.okio)
+  api(libs.kotlin.coroutines)
 
   testImplementation(kotlin("test-junit5"))
   testImplementation(libs.test.assertk)

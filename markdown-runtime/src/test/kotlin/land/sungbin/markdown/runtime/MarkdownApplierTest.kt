@@ -16,10 +16,6 @@ import assertk.assertions.isEmpty
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlinx.coroutines.test.runTest
-import land.sungbin.markdown.runtime.node.Column
-import land.sungbin.markdown.runtime.node.EmptyUpdater
-import land.sungbin.markdown.runtime.node.SimpleMarkdownRoot
-import land.sungbin.markdown.runtime.node.Text
 import okio.Buffer
 
 class MarkdownApplierTest {
@@ -99,8 +95,8 @@ class MarkdownApplierTest {
     val failure = assertFailure {
       buffer.markdown {
         ComposeNode<MarkdownNode, MarkdownApplier>(
-          factory = { SimpleMarkdownRoot(MarkdownOptions(), Buffer()) },
-          update = EmptyUpdater,
+          factory = { MarkdownLayoutNode(MarkdownOptions(), Buffer()) },
+          update = {},
         )
       }
     }

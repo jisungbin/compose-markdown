@@ -2,6 +2,8 @@ package land.sungbin.markdown.ui.text
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.util.fastFold
+import land.sungbin.markdown.runtime.MarkdownOptions
+import land.sungbin.markdown.ui.bufferCursor
 import okio.BufferedSink
 
 @Immutable
@@ -18,7 +20,7 @@ public data class TextStyle(
     if (uppercase && lowercase) error("Cannot set uppercase and lowercase at the same time")
   }
 
-  public fun textTransformer(): TextTransformer = TextTransformer { sink ->
+  public fun textTransformer(): TextTransformer = TextTransformer { sink, options ->
     val transformers = buildList {
       if (uppercase) add(UppercaseTransformer)
       if (lowercase) add(LowercaseTransformer)
@@ -28,7 +30,7 @@ public data class TextStyle(
       if (underline) add(TextStyleDefinition.Unerline)
       if (monospace) add(TextStyleDefinition.Monospace)
     }
-    transformers.fastFold(sink) { acc, transformer -> transformer.transform(acc) }
+    transformers.fastFold(sink) { acc, transformer -> transformer.transform(acc, options) }
   }
 
   public companion object {
@@ -39,8 +41,8 @@ public data class TextStyle(
 private object UppercaseTransformer : TextTransformer {
   private const val UPPER_CASE_OFFSET = ('A'.code - 'a'.code).toByte()
 
-  override fun transform(sink: BufferedSink) = sink.apply {
-    buffer.readAndWriteUnsafe().use { cursor ->
+  override fun transform(sink: BufferedSink, options: MarkdownOptions): BufferedSink = sink.apply {
+    buffer.readAndWriteUnsafe(bufferCursor).use { cursor ->
       cursor.seek(0)
       while (cursor.next() != -1) {
         cursor.data!![cursor.start] = cursor.data!![cursor.start].uppercase()
@@ -57,8 +59,8 @@ private object UppercaseTransformer : TextTransformer {
 private object LowercaseTransformer : TextTransformer {
   private const val LOWER_CASE_OFFSET = ('a'.code - 'A'.code).toByte()
 
-  override fun transform(sink: BufferedSink) = sink.apply {
-    buffer.readAndWriteUnsafe().use { cursor ->
+  override fun transform(sink: BufferedSink, options: MarkdownOptions): BufferedSink = sink.apply {
+    buffer.readAndWriteUnsafe(bufferCursor).use { cursor ->
       cursor.seek(0)
       while (cursor.next() != -1) {
         cursor.data!![cursor.start] = cursor.data!![cursor.start].lowercase()

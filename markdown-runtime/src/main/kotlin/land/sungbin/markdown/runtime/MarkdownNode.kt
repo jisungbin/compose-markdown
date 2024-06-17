@@ -23,7 +23,7 @@ public sealed interface MarkdownNode {
   public fun interface Text : Renderable
 
   public interface Group : Renderable {
-    // TODO nested groups?
+    // TODO nested groups
     public fun insert(index: Int, text: Text)
   }
 }

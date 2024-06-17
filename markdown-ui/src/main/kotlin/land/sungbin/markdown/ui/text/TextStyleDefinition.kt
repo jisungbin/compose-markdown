@@ -1,12 +1,14 @@
 package land.sungbin.markdown.ui.text
 
 import androidx.compose.runtime.Immutable
+import land.sungbin.markdown.runtime.MarkdownOptions
+import land.sungbin.markdown.ui.bufferCursor
 import okio.BufferedSink
 
 @Immutable
 public data class TextStyleDefinition(public val open: String, public val end: String = open) : TextTransformer {
-  override fun transform(sink: BufferedSink): BufferedSink = sink.apply {
-    buffer.readAndWriteUnsafe().use { cursor ->
+  override fun transform(sink: BufferedSink, options: MarkdownOptions): BufferedSink = sink.apply {
+    buffer.readAndWriteUnsafe(bufferCursor).use { cursor ->
       val previousSize = cursor.resizeBuffer(buffer.size + open.length + end.length)
       cursor.seek(0)
       cursor.data!!.copyInto(
