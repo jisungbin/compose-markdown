@@ -14,7 +14,7 @@ public data class AnnotatedString(public val styledTexts: List<TextAndStyle>) : 
     apply { write { writeAll(text(options)) } }
 
   public fun text(options: MarkdownOptions): Source = styledTexts.fastFold(Buffer()) { acc, (text, style) ->
-    val styled = style.textTransformer().transform(bufferOf(text), options)
+    val styled = style.transform(bufferOf(text), options)
     acc.apply { writeAll(styled.buffer) }
   }
 

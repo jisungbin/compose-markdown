@@ -15,23 +15,23 @@ public data class TextStyle(
   public val monospace: Boolean = false,
   public val uppercase: Boolean = false,
   public val lowercase: Boolean = false,
-) {
+) : TextTransformer {
   init {
     if (uppercase && lowercase) error("Cannot set uppercase and lowercase at the same time")
   }
 
-  public fun textTransformer(): TextTransformer = TextTransformer { sink, options ->
-    val transformers = buildList {
-      if (uppercase) add(UppercaseTransformer)
-      if (lowercase) add(LowercaseTransformer)
-      if (bold) add(TextStyleDefinition.Bold)
-      if (italics) add(TextStyleDefinition.Italic)
-      if (strikethrough) add(TextStyleDefinition.Strikethrough)
-      if (underline) add(TextStyleDefinition.Unerline)
-      if (monospace) add(TextStyleDefinition.Monospace)
-    }
-    transformers.fastFold(sink) { acc, transformer -> transformer.transform(acc, options) }
+  private val transformers = buildList {
+    if (uppercase) add(UppercaseTransformer)
+    if (lowercase) add(LowercaseTransformer)
+    if (bold) add(TextStyleDefinition.Bold)
+    if (italics) add(TextStyleDefinition.Italic)
+    if (strikethrough) add(TextStyleDefinition.Strikethrough)
+    if (underline) add(TextStyleDefinition.Unerline)
+    if (monospace) add(TextStyleDefinition.Monospace)
   }
+
+  override fun transform(sink: BufferedSink, options: MarkdownOptions): BufferedSink =
+    transformers.fastFold(sink) { acc, transformer -> transformer.transform(acc, options) }
 
   public companion object {
     public val Default: TextStyle = TextStyle()
