@@ -36,6 +36,7 @@ public infix fun Modifier.then(transformer: TextTransformer): Modifier {
   return (this as MutableModifier).apply { add(transformer) }
 }
 
+// TODO sink를 clone 하지 않음 -> 문서화 필요
 internal fun Modifier.applyTo(sink: BufferedSink, options: MarkdownOptions): BufferedSink {
   if (isEmpty()) return sink
   var acc = sink
