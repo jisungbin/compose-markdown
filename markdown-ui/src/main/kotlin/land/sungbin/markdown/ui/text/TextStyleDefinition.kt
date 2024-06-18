@@ -3,6 +3,7 @@ package land.sungbin.markdown.ui.text
 import androidx.compose.runtime.Immutable
 import land.sungbin.markdown.runtime.MarkdownOptions
 import land.sungbin.markdown.ui.bufferCursor
+import land.sungbin.markdown.ui.fastRepeat
 import okio.BufferedSink
 
 @Immutable
@@ -17,11 +18,11 @@ public data class TextStyleDefinition(public val open: String, public val end: S
         startIndex = cursor.start,
         endIndex = previousSize.toInt(),
       )
-      repeat(open.length) { offset ->
+      fastRepeat(open.length) { offset ->
         cursor.data!![cursor.start + offset] = open[offset].code.toByte()
       }
       cursor.seek(cursor.buffer!!.size - end.length)
-      repeat(end.length) { offset ->
+      fastRepeat(end.length) { offset ->
         cursor.data!![cursor.start + offset] = end[offset].code.toByte()
       }
     }

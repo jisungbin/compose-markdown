@@ -13,8 +13,8 @@ public sealed interface Size {
 }
 
 public class FixedSize(width: Int, height: Int) : Size {
-  public override val width: String = "$width"
-  public override val height: String = "$height"
+  public override val width: String = width.toString()
+  public override val height: String = height.toString()
 
   override fun equals(other: Any?): Boolean {
     if (this === other) return true

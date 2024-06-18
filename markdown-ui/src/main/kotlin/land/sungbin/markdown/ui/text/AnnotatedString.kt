@@ -11,7 +11,7 @@ import okio.Source
 public data class AnnotatedString(public val styledTexts: List<TextAndStyle>) : AbstractText() {
   @Suppress("RedundantVisibilityModifier")
   internal override fun lazyWriting(options: MarkdownOptions): AbstractText =
-    apply { write { writeAll(text(options)) } }
+    apply { sink { writeAll(text(options)) } }
 
   public fun text(options: MarkdownOptions): Source = styledTexts.fastFold(Buffer()) { acc, (text, style) ->
     val styled = style.transform(bufferOf(text), options)
@@ -19,7 +19,10 @@ public data class AnnotatedString(public val styledTexts: List<TextAndStyle>) : 
   }
 
   @Immutable
-  public data class TextAndStyle(public val text: String, public val style: TextStyle)
+  public data class TextAndStyle(
+    public val text: String,
+    public val style: TextStyle = TextStyle.Default,
+  )
 }
 
 // TODO public fun buildAnnotatedString()

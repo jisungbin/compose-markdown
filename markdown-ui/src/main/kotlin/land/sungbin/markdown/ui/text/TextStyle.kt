@@ -4,6 +4,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.ui.util.fastFold
 import land.sungbin.markdown.runtime.MarkdownOptions
 import land.sungbin.markdown.ui.bufferCursor
+import land.sungbin.markdown.ui.fastRepeat
 import okio.BufferedSink
 
 @Immutable
@@ -44,8 +45,8 @@ private object UppercaseTransformer : TextTransformer {
   override fun transform(sink: BufferedSink, options: MarkdownOptions): BufferedSink = sink.apply {
     buffer.readAndWriteUnsafe(bufferCursor).use { cursor ->
       cursor.seek(0)
-      while (cursor.next() != -1) {
-        cursor.data!![cursor.start] = cursor.data!![cursor.start].uppercase()
+      fastRepeat(cursor.end) { offset ->
+        cursor.data!![offset] = cursor.data!![offset].uppercase()
       }
     }
   }
@@ -62,8 +63,8 @@ private object LowercaseTransformer : TextTransformer {
   override fun transform(sink: BufferedSink, options: MarkdownOptions): BufferedSink = sink.apply {
     buffer.readAndWriteUnsafe(bufferCursor).use { cursor ->
       cursor.seek(0)
-      while (cursor.next() != -1) {
-        cursor.data!![cursor.start] = cursor.data!![cursor.start].lowercase()
+      fastRepeat(cursor.end) { offset ->
+        cursor.data!![offset] = cursor.data!![offset].lowercase()
       }
     }
   }

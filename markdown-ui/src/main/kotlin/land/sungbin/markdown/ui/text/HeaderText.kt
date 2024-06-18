@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.NonRestartableComposable
 import land.sungbin.markdown.runtime.MarkdownComposable
 import land.sungbin.markdown.ui.bufferOf
+import land.sungbin.markdown.ui.fastRepeat
 import land.sungbin.markdown.ui.modifier.Modifier
 import okio.BufferedSource
 
@@ -12,8 +13,8 @@ internal class HeaderText(level: Int, value: BufferedSource) : AbstractText() {
   init {
     require(level in 1..6) { "Header level should be in 1..6" }
 
-    write {
-      repeat(level) { writeByte('#'.code) }
+    sink {
+      fastRepeat(level) { writeByte('#'.code) }
       writeByte(' '.code)
       writeAll(value)
     }
@@ -36,53 +37,35 @@ public inline fun Header(
 @Suppress("NOTHING_TO_INLINE")
 @[Composable NonRestartableComposable MarkdownComposable]
 public inline fun H1(text: CharSequence, modifier: Modifier = Modifier) {
-  Text(
-    modifier = modifier,
-    value = HeaderText(level = 1, value = bufferOf(text)),
-  )
+  Header(level = 1, text = text, modifier = modifier)
 }
 
 @Suppress("NOTHING_TO_INLINE")
 @[Composable NonRestartableComposable MarkdownComposable]
 public inline fun H2(text: CharSequence, modifier: Modifier = Modifier) {
-  Text(
-    modifier = modifier,
-    value = HeaderText(level = 2, value = bufferOf(text)),
-  )
+  Header(level = 2, text = text, modifier = modifier)
 }
 
 @Suppress("NOTHING_TO_INLINE")
 @[Composable NonRestartableComposable MarkdownComposable]
 public inline fun H3(text: CharSequence, modifier: Modifier = Modifier) {
-  Text(
-    modifier = modifier,
-    value = HeaderText(level = 3, value = bufferOf(text)),
-  )
+  Header(level = 3, text = text, modifier = modifier)
 }
 
 @Suppress("NOTHING_TO_INLINE")
 @[Composable NonRestartableComposable MarkdownComposable]
 public inline fun H4(text: CharSequence, modifier: Modifier = Modifier) {
-  Text(
-    modifier = modifier,
-    value = HeaderText(level = 4, value = bufferOf(text)),
-  )
+  Header(level = 4, text = text, modifier = modifier)
 }
 
 @Suppress("NOTHING_TO_INLINE")
 @[Composable NonRestartableComposable MarkdownComposable]
 public inline fun H5(text: CharSequence, modifier: Modifier = Modifier) {
-  Text(
-    modifier = modifier,
-    value = HeaderText(level = 5, value = bufferOf(text)),
-  )
+  Header(level = 5, text = text, modifier = modifier)
 }
 
 @Suppress("NOTHING_TO_INLINE")
 @[Composable NonRestartableComposable MarkdownComposable]
 public inline fun H6(text: CharSequence, modifier: Modifier = Modifier) {
-  Text(
-    modifier = modifier,
-    value = HeaderText(level = 6, value = bufferOf(text)),
-  )
+  Header(level = 6, text = text, modifier = modifier)
 }

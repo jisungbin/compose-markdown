@@ -18,8 +18,8 @@ public abstract class AbstractText internal constructor() : CharSequence {
 
   final override fun get(index: Int): Char = buffer[index.toLong()].toInt().toChar()
 
-  internal inline fun <T> read(action: BufferedSource.() -> T): T = buffer.clone().use(action)
-  internal inline fun <T> write(action: BufferedSink.() -> T): T = buffer.run(action)
+  internal inline fun <T> source(action: BufferedSource.() -> T): T = action(buffer)
+  internal inline fun <T> sink(action: BufferedSink.() -> T): T = action(buffer)
 
   @PublishedApi
   internal open fun lazyWriting(options: MarkdownOptions): AbstractText = this
