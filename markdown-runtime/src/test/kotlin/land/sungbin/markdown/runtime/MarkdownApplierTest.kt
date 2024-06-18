@@ -33,9 +33,7 @@ class MarkdownApplierTest {
     }
     assertThat(buffer.readUtf8().lines()).containsExactly(
       "[#0] Hello World!",
-      "",
       "[#1] Hello World!",
-      "",
       "[#2] Hello World!",
     )
   }
@@ -76,17 +74,13 @@ class MarkdownApplierTest {
     }
     assertThat(buffer.readUtf8().lines()).containsExactly(
       "[#0] Hello World!",
-      "",
       "[#1] Hello World!",
-      "",
       "[#2] Hello World!",
-      "",
       "[#0] Bye World!",
       "<br/>",
       "[#1] Bye World!",
       "<br/>",
       "[#2] Bye World!",
-      "",
       "",
     )
   }

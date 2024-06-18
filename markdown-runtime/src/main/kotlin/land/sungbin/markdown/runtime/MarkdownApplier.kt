@@ -50,7 +50,7 @@ public class MarkdownApplier internal constructor(private val root: MarkdownNode
       if (current.buffer.exhausted()) {
         current.buffer.writeAll(tail.render(options = root.options))
       } else {
-        current.buffer.writeUtf8("\n\n").writeAll(tail.render(options = root.options))
+        current.buffer.writeUtf8("\n").writeAll(tail.render(options = root.options))
       }
     }
   }

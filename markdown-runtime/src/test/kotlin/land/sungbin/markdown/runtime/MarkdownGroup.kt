@@ -1,3 +1,10 @@
+/*
+ * Developed by Ji Sungbin 2024.
+ *
+ * Licensed under the MIT.
+ * Please see full license: https://github.com/jisungbin/compose-markdown/blob/main/LICENSE
+ */
+
 package land.sungbin.markdown.runtime
 
 import androidx.compose.runtime.Composable
@@ -7,12 +14,11 @@ import okio.Buffer
 import okio.Source
 
 class MarkdownGroup : MarkdownNode.Group {
-  private var texts = arrayOfNulls<MarkdownNode.Text>(10)
+  private var texts = arrayOfNulls<MarkdownNode.Text>(4096)
   private var maxIndex = -1
 
   override fun insert(index: Int, text: MarkdownNode.Text) {
     maxIndex = max(maxIndex, index)
-    ensureCapacity(maxIndex + 1)
     texts[index] = text
   }
 
@@ -27,12 +33,6 @@ class MarkdownGroup : MarkdownNode.Group {
     }
 
     return buffer
-  }
-
-  private fun ensureCapacity(size: Int) {
-    if (texts.size < size) {
-      texts = texts.copyOf(size + 10)
-    }
   }
 }
 

@@ -1,4 +1,4 @@
- /*
+/*
  * Developed by Ji Sungbin 2024.
  *
  * Licensed under the MIT.

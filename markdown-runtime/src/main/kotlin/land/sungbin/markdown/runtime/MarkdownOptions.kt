@@ -8,13 +8,10 @@
 package land.sungbin.markdown.runtime
 
 import androidx.compose.runtime.Immutable
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import okio.Path
 
 @Immutable
 public data class MarkdownOptions(
-  public val scope: CoroutineScope = CoroutineScope(Dispatchers.IO),
   public val listIndent: Int = 3,
   public val newLineCharacter: String = "<br/>",
   public val defaultCodeBlockLanguage: String? = null,
