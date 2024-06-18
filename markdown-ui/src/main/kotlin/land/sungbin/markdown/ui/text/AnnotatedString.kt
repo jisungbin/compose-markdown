@@ -1,21 +1,19 @@
 package land.sungbin.markdown.ui.text
 
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.util.fastFold
-import land.sungbin.markdown.runtime.MarkdownOptions
 import land.sungbin.markdown.ui.bufferOf
 import okio.Buffer
-import okio.Source
 
 @Immutable
 public data class AnnotatedString(public val styledTexts: List<TextAndStyle>) : AbstractText() {
-  @Suppress("RedundantVisibilityModifier")
-  internal override fun lazyWriting(options: MarkdownOptions): AbstractText =
-    apply { sink { writeAll(text(options)) } }
-
-  public fun text(options: MarkdownOptions): Source = styledTexts.fastFold(Buffer()) { acc, (text, style) ->
-    val styled = style.transform(bufferOf(text), options)
-    acc.apply { writeAll(styled.buffer) }
+  init {
+    val styled = styledTexts.fastFold(Buffer()) { acc, (text, style) ->
+      val styled = style.transform(bufferOf(text))
+      acc.apply { writeAll(styled.buffer) }
+    }
+    sink { writeAll(styled) }
   }
 
   @Immutable
@@ -23,6 +21,24 @@ public data class AnnotatedString(public val styledTexts: List<TextAndStyle>) : 
     public val text: String,
     public val style: TextStyle = TextStyle.Default,
   )
+
+  public class Builder @PublishedApi internal constructor() {
+    @PublishedApi
+    internal val texts: MutableList<TextAndStyle> = mutableListOf()
+
+    public fun append(text: String) {
+      texts.add(TextAndStyle(text))
+    }
+
+    public inline fun withStyle(style: TextStyle, crossinline text: () -> String) {
+      texts.add(TextAndStyle(text(), style))
+    }
+
+    @PublishedApi
+    internal fun build(): AnnotatedString = AnnotatedString(texts)
+  }
 }
 
-// TODO public fun buildAnnotatedString()
+@Stable
+public inline fun buildAnnotatedString(builder: AnnotatedString.Builder.() -> Unit): AnnotatedString =
+  AnnotatedString.Builder().apply(builder).build()

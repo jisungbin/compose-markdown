@@ -12,11 +12,10 @@ import okio.Source
 
 public sealed interface MarkdownNode {
   public sealed interface Renderable : MarkdownNode {
-    public fun render(options: MarkdownOptions): Source
+    public fun render(): Source
   }
 
   public interface Root : MarkdownNode {
-    public val options: MarkdownOptions
     public val buffer: Buffer
   }
 

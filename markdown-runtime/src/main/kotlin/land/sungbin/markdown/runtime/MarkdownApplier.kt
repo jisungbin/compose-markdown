@@ -17,8 +17,7 @@ public class MarkdownApplier internal constructor(private val root: MarkdownNode
   private val stack = MutableVector<MarkdownNode>(capacity = 10).apply { add(root) }
   override var current: MarkdownNode = root
 
-  public constructor(options: MarkdownOptions, buffer: Buffer) :
-    this(root = MarkdownLayoutNode(options = options, buffer = buffer))
+  public constructor(buffer: Buffer) : this(root = MarkdownLayoutNode(buffer = buffer))
 
   override fun insertTopDown(index: Int, instance: MarkdownNode) {
     assertNotNestedRoot(instance)
@@ -48,9 +47,9 @@ public class MarkdownApplier internal constructor(private val root: MarkdownNode
     val current = current
     if (current is MarkdownNode.Root && tail is MarkdownNode.Renderable) {
       if (current.buffer.exhausted()) {
-        current.buffer.writeAll(tail.render(options = root.options))
+        current.buffer.writeAll(tail.render())
       } else {
-        current.buffer.writeUtf8("\n").writeAll(tail.render(options = root.options))
+        current.buffer.writeUtf8("\n").writeAll(tail.render())
       }
     }
   }

@@ -13,7 +13,7 @@ import okio.Buffer
 import okio.Source
 
 class MarkdownText(private val text: String) : MarkdownNode.Text {
-  override fun render(options: MarkdownOptions): Source = Buffer().writeUtf8(text)
+  override fun render(): Source = Buffer().writeUtf8(text)
   override fun toString(): String = text
 }
 

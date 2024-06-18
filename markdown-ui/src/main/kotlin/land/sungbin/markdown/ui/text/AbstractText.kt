@@ -1,9 +1,6 @@
-@file:Suppress("unused")
-
 package land.sungbin.markdown.ui.text
 
 import androidx.compose.runtime.Stable
-import land.sungbin.markdown.runtime.MarkdownOptions
 import okio.Buffer
 import okio.BufferedSink
 import okio.BufferedSource
@@ -20,9 +17,6 @@ public abstract class AbstractText internal constructor() : CharSequence {
 
   internal inline fun <T> source(action: BufferedSource.() -> T): T = action(buffer)
   internal inline fun <T> sink(action: BufferedSink.() -> T): T = action(buffer)
-
-  @PublishedApi
-  internal open fun lazyWriting(options: MarkdownOptions): AbstractText = this
 
   final override fun subSequence(startIndex: Int, endIndex: Int): CharSequence =
     buffer.snapshot().substring(startIndex, endIndex).asCharSequence()

@@ -52,8 +52,8 @@ class ModifierTest {
     assertThat(Modifier).isSameInstanceAs(Modifier)
   }
 
-  private val testModifier1 = TextTransformer { s, _ -> s }
-  private val testModifier2 = TextTransformer { s, _ -> s }
-  private val testModifier3 = TextTransformer { s, _ -> s }
-  private val testModifier4 = TextTransformer { s, _ -> s }
+  private val testModifier1 = TextTransformer { it }
+  private val testModifier2 = TextTransformer { it }
+  private val testModifier3 = TextTransformer { it }
+  private val testModifier4 = TextTransformer { it }
 }

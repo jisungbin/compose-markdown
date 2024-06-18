@@ -22,14 +22,14 @@ class MarkdownGroup : MarkdownNode.Group {
     texts[index] = text
   }
 
-  override fun render(options: MarkdownOptions): Source {
+  override fun render(): Source {
     val buffer = Buffer()
     if (maxIndex < 0) return buffer
 
     for (index in 0..maxIndex) {
       val text = checkNotNull(texts[index]) { "Text at index $index is null. This should not happen." }
-      buffer.writeAll(text.render(options))
-      if (index < maxIndex) buffer.writeUtf8("\n").writeUtf8(options.newLineCharacter).writeUtf8("\n")
+      buffer.writeAll(text.render())
+      if (index < maxIndex) buffer.writeUtf8("\n").writeUtf8("<br/>").writeUtf8("\n")
     }
 
     return buffer

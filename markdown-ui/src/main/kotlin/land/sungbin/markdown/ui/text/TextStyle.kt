@@ -2,7 +2,6 @@ package land.sungbin.markdown.ui.text
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.util.fastFold
-import land.sungbin.markdown.runtime.MarkdownOptions
 import land.sungbin.markdown.ui.bufferCursor
 import land.sungbin.markdown.ui.fastRepeat
 import okio.BufferedSink
@@ -31,8 +30,8 @@ public data class TextStyle(
     if (monospace) add(TextStyleDefinition.Monospace)
   }
 
-  override fun transform(sink: BufferedSink, options: MarkdownOptions): BufferedSink =
-    transformers.fastFold(sink) { acc, transformer -> transformer.transform(acc, options) }
+  override fun transform(sink: BufferedSink): BufferedSink =
+    transformers.fastFold(sink) { acc, transformer -> transformer.transform(acc) }
 
   public companion object {
     public val Default: TextStyle = TextStyle()
@@ -42,7 +41,7 @@ public data class TextStyle(
 private object UppercaseTransformer : TextTransformer {
   private const val UPPER_CASE_OFFSET = ('A'.code - 'a'.code).toByte()
 
-  override fun transform(sink: BufferedSink, options: MarkdownOptions): BufferedSink = sink.apply {
+  override fun transform(sink: BufferedSink): BufferedSink = sink.apply {
     buffer.readAndWriteUnsafe(bufferCursor).use { cursor ->
       cursor.seek(0)
       fastRepeat(cursor.end) { offset ->
@@ -60,7 +59,7 @@ private object UppercaseTransformer : TextTransformer {
 private object LowercaseTransformer : TextTransformer {
   private const val LOWER_CASE_OFFSET = ('a'.code - 'A'.code).toByte()
 
-  override fun transform(sink: BufferedSink, options: MarkdownOptions): BufferedSink = sink.apply {
+  override fun transform(sink: BufferedSink): BufferedSink = sink.apply {
     buffer.readAndWriteUnsafe(bufferCursor).use { cursor ->
       cursor.seek(0)
       fastRepeat(cursor.end) { offset ->

@@ -9,6 +9,8 @@ package land.sungbin.markdown.runtime
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
+import androidx.compose.runtime.CompositionLocalContext
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.withRunningRecomposer
 import kotlin.coroutines.coroutineContext
 import kotlinx.coroutines.CancellationException
@@ -18,7 +20,7 @@ import kotlinx.coroutines.withContext
 import okio.Buffer
 
 public suspend inline fun Buffer.markdown(
-  options: MarkdownOptions = MarkdownOptions.Default,
+  parentScopes: CompositionLocalContext? = null,
   crossinline content: @MarkdownComposable @Composable () -> Unit,
 ) {
   val job = Job(parent = coroutineContext[Job])
@@ -28,11 +30,13 @@ public suspend inline fun Buffer.markdown(
     var composition: Composition? = null
     try {
       withRunningRecomposer { recomposer ->
-        composition = Composition(
-          applier = MarkdownApplier(options = options, buffer = this@markdown),
-          parent = recomposer,
-        )
-        composition!!.setContent { content() }
+        composition = Composition(MarkdownApplier(buffer = this@markdown), parent = recomposer)
+        composition!!.setContent {
+          when (parentScopes) {
+            null -> content()
+            else -> CompositionLocalProvider(parentScopes) { content() }
+          }
+        }
       }
     } catch (cce: CancellationException) {
       job.cancel(cce)
