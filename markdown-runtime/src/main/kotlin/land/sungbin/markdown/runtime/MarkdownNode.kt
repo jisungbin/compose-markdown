@@ -7,22 +7,28 @@
 
 package land.sungbin.markdown.runtime
 
-import okio.Buffer
-import okio.Source
-
 public sealed interface MarkdownNode {
-  public sealed interface Renderable : MarkdownNode {
-    public fun render(): Source
+  public interface Root : MarkdownNode {
+    public val buffer: MutableList<MarkdownSource>
   }
 
-  public interface Root : MarkdownNode {
-    public val buffer: Buffer
+  public sealed interface Renderable : MarkdownNode {
+    public fun render(): MarkdownSource
   }
 
   public fun interface Text : Renderable
 
   public interface Group : Renderable {
-    // TODO nested groups
-    public fun insert(index: Int, text: Text)
+    public val size: Int
+    public fun insert(index: Int, node: Renderable)
+  }
+
+  public interface Quote : Group
+  public interface Code : Group
+  public interface List : Group
+  public interface Footnote : Group
+
+  public companion object {
+    public const val INDENT_MARK: String = "    "
   }
 }

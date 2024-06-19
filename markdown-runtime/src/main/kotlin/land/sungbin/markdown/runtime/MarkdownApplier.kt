@@ -11,23 +11,29 @@ import androidx.compose.runtime.Applier
 import androidx.compose.runtime.collection.MutableVector
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
-import okio.Buffer
 
-public class MarkdownApplier internal constructor(private val root: MarkdownNode.Root) : Applier<MarkdownNode> {
-  private val stack = MutableVector<MarkdownNode>(capacity = 10).apply { add(root) }
+// AbstractApplier uses MutableList, but I want to use MutableVector.
+internal class MarkdownApplier(private val root: MarkdownNode.Root) : Applier<MarkdownNode> {
+  // TODO consider whether a capacity of 50 is the best default value
+  private val stack = MutableVector<MarkdownNode>(capacity = 50).apply { add(root) }
   override var current: MarkdownNode = root
 
-  public constructor(buffer: Buffer) : this(root = MarkdownLayoutNode(buffer = buffer))
+  constructor(buffer: MutableList<MarkdownSource>) : this(MarkdownLayoutNode(buffer))
 
   override fun insertTopDown(index: Int, instance: MarkdownNode) {
     assertNotNestedRoot(instance)
 
     when (val current = current) {
       is MarkdownNode.Group -> {
-        assertNotNestedGroup(instance)
+        if (instance is MarkdownNode.Footnote && current is MarkdownNode.Footnote) {
+          throw MarkdownException("Footnote cannot be nested.")
+        }
+        if (instance is MarkdownNode.Code && current is MarkdownNode.Code) {
+          throw MarkdownException("Code cannot be nested.")
+        }
         current.insert(index, instance)
       }
-      is MarkdownNode.Root -> Unit // This is handled by up().
+      is MarkdownNode.Root -> Unit // Root is handled by up().
       is MarkdownNode.Text -> error("Text node cannot have children.")
     }
   }
@@ -38,18 +44,23 @@ public class MarkdownApplier internal constructor(private val root: MarkdownNode
   }
 
   override fun up() {
-    val tail = current
+    check(stack.isNotEmpty()) { "stack is empty. cannot up()" }
 
-    check(stack.isNotEmpty()) { "empty stack" }
+    val tail = current
+    assertNotNestedRoot(tail)
+
     stack.removeAt(stack.lastIndex)
     current = stack.last()
 
     val current = current
-    if (current is MarkdownNode.Root && tail is MarkdownNode.Renderable) {
-      if (current.buffer.exhausted()) {
-        current.buffer.writeAll(tail.render())
-      } else {
-        current.buffer.writeUtf8("\n").writeAll(tail.render())
+    if (current !is MarkdownNode.Root) return
+
+    when (tail) {
+      is MarkdownNode.Text -> current.buffer.add(tail.render())
+      is MarkdownNode.Group -> {
+        repeat(tail.size) {
+          current.buffer.add(tail.render())
+        }
       }
     }
   }
@@ -63,7 +74,11 @@ public class MarkdownApplier internal constructor(private val root: MarkdownNode
   }
 
   override fun clear() {
-    // Nothing to do.
+    val current = current
+    if (current !is MarkdownNode.Root) {
+      error("Unexpected clear() call on non-root node.")
+    }
+    current.buffer.add(MarkdownSource.END_DOCUMENT)
   }
 
   override fun insertBottomUp(index: Int, instance: MarkdownNode) {
@@ -74,15 +89,7 @@ public class MarkdownApplier internal constructor(private val root: MarkdownNode
   private fun assertNotNestedRoot(node: MarkdownNode) {
     contract { returns() implies (node is MarkdownNode.Renderable) }
     if (node is MarkdownNode.Root) {
-      throw NotImplementedError("Nested markdown is not supported.")
-    }
-  }
-
-  @OptIn(ExperimentalContracts::class)
-  private fun assertNotNestedGroup(node: MarkdownNode) {
-    contract { returns() implies (node is MarkdownNode.Text) }
-    if (node is MarkdownNode.Group) {
-      throw NotImplementedError("Nested group is not supported.")
+      throw NotImplementedError("Nested markdown root is not supported.")
     }
   }
 

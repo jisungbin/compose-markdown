@@ -7,8 +7,6 @@
 
 package land.sungbin.markdown.runtime
 
-import okio.Buffer
-
-internal class MarkdownLayoutNode(override val buffer: Buffer) : MarkdownNode.Root {
+internal class MarkdownLayoutNode(override val buffer: MutableList<MarkdownSource>) : MarkdownNode.Root {
   override fun toString(): String = "MarkdownLayoutNode@${hashCode()}"
 }

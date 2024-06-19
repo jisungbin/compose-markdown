@@ -19,9 +19,9 @@ import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.withContext
 import okio.Buffer
 
-public suspend inline fun Buffer.markdown(
+public suspend fun Buffer.markdown(
   parentScopes: CompositionLocalContext? = null,
-  crossinline content: @MarkdownComposable @Composable () -> Unit,
+  content: @MarkdownComposable @Composable () -> Unit,
 ) {
   val job = Job(parent = coroutineContext[Job])
   val composeContext = coroutineContext + ImmediatelyFrameClock + job
@@ -49,4 +49,8 @@ public suspend inline fun Buffer.markdown(
   }
 
   job.cancelAndJoin()
+}
+
+private fun StringBuilder.handleMarkdown(source: MarkdownSource) {
+  // TODO
 }
