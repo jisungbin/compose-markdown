@@ -1,7 +1,6 @@
 package land.sungbin.markdown.ui.modifier
 
 import androidx.compose.runtime.Stable
-import land.sungbin.markdown.ui.fastRepeat
 import land.sungbin.markdown.ui.text.TextTransformer
 import okio.BufferedSink
 
@@ -36,10 +35,10 @@ public infix fun Modifier.then(transformer: TextTransformer): Modifier {
   return (this as MutableModifier).apply { add(transformer) }
 }
 
-// TODO sink를 clone 하지 않음 -> 문서화 필요
+// TODO not cloning the sink -> Documentation required
 internal fun Modifier.applyTo(sink: BufferedSink): BufferedSink {
   if (isEmpty()) return sink
   var acc = sink
-  fastRepeat(size) { index -> acc = get(index).transform(acc) }
+  repeat(size) { index -> acc = get(index).transform(acc) }
   return acc
 }

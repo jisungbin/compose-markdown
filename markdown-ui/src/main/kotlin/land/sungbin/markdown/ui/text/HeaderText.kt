@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.NonRestartableComposable
 import land.sungbin.markdown.runtime.MarkdownComposable
 import land.sungbin.markdown.ui.bufferOf
-import land.sungbin.markdown.ui.fastRepeat
 import land.sungbin.markdown.ui.modifier.Modifier
 import okio.BufferedSource
 
@@ -14,7 +13,7 @@ internal class HeaderText(level: Int, value: BufferedSource) : AbstractText() {
     require(level in 1..6) { "Header level should be in 1..6" }
 
     sink {
-      fastRepeat(level) { writeByte('#'.code) }
+      repeat(level) { writeByte('#'.code) }
       writeByte(' '.code)
       writeAll(value)
     }

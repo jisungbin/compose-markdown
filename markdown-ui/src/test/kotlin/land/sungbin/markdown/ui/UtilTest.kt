@@ -1,7 +1,6 @@
 package land.sungbin.markdown.ui
 
 import assertk.assertThat
-import assertk.assertions.containsExactly
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isNotEqualTo
@@ -33,11 +32,5 @@ class UtilTest {
 
     assertThat(target.buffer.snapshot()).isEqualTo(targetSnapshot)
     assertThat(buffer.snapshot()).isNotEqualTo(bufferSnapshot)
-  }
-
-  @Test fun fastRepeat() {
-    val numbers = mutableListOf<Int>()
-    fastRepeat(10, block = numbers::add)
-    assertThat(numbers).containsExactly(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
   }
 }

@@ -11,7 +11,7 @@ class UnitTest {
     assertThat(size.height).isEqualTo("200")
   }
 
-  @Test  fun percentage() {
+  @Test fun percentage() {
     val size = Percentage(55.5f, 70.2f)
     assertThat(size.width).isEqualTo("56%")
     assertThat(size.height).isEqualTo("70%")
