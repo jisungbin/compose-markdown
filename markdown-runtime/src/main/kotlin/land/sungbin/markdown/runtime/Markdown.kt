@@ -11,30 +11,49 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
 import androidx.compose.runtime.CompositionLocalContext
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.collection.MutableVector
+import androidx.compose.runtime.currentCompositionLocalContext
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.withRunningRecomposer
 import kotlin.coroutines.coroutineContext
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import okio.Buffer
 
-public suspend fun Buffer.markdown(
-  parentScopes: CompositionLocalContext? = null,
+@Suppress("NOTHING_TO_INLINE")
+@Composable
+public inline fun markdown(
+  options: MarkdownOptions = MarkdownOptions.Default,
+  noinline content: @MarkdownComposable @Composable () -> Unit,
+) {
+  val scope = rememberCoroutineScope()
+  val locals = currentCompositionLocalContext
+  scope.launch {
+    markdown(options = options, parentLocals = locals, content = content)
+  }
+}
+
+public suspend fun markdown(
+  options: MarkdownOptions = MarkdownOptions.Default,
+  parentLocals: CompositionLocalContext? = null,
   content: @MarkdownComposable @Composable () -> Unit,
 ) {
   val job = Job(parent = coroutineContext[Job])
   val composeContext = coroutineContext + ImmediatelyFrameClock + job
+  val root = MutableVector<MarkdownSource>(capacity = 50)
 
   withContext(context = composeContext) {
     var composition: Composition? = null
     try {
       withRunningRecomposer { recomposer ->
-        composition = Composition(MarkdownApplier(buffer = this@markdown), parent = recomposer)
-        composition!!.setContent {
-          when (parentScopes) {
-            null -> content()
-            else -> CompositionLocalProvider(parentScopes) { content() }
+        composition = Composition(MarkdownApplier(root), parent = recomposer).apply {
+          setContent {
+            when (parentLocals) {
+              null -> content()
+              else -> CompositionLocalProvider(parentLocals) { content() }
+            }
           }
         }
       }
@@ -42,15 +61,10 @@ public suspend fun Buffer.markdown(
       job.cancel(cce)
     } catch (error: Throwable) {
       job.cancel(CancellationException().apply { initCause(error) })
-      throw error
     } finally {
       composition?.dispose()
     }
   }
 
   job.cancelAndJoin()
-}
-
-private fun StringBuilder.handleMarkdown(source: MarkdownSource) {
-  // TODO
 }

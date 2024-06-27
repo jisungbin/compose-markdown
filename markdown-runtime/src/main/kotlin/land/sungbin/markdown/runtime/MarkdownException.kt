@@ -1,6 +1,6 @@
 package land.sungbin.markdown.runtime
 
-public class MarkdownException(
+public open class MarkdownException(
   override val message: String? = null,
   override val cause: Throwable? = null,
 ) : RuntimeException()

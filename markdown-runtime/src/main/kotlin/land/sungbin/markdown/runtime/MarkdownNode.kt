@@ -7,9 +7,12 @@
 
 package land.sungbin.markdown.runtime
 
+import androidx.compose.runtime.collection.MutableVector
+
 public sealed interface MarkdownNode {
   public interface Root : MarkdownNode {
-    public val buffer: MutableList<MarkdownSource>
+    public val contents: MutableVector<MarkdownSource>
+    public val footnotes: MutableVector<MarkdownSource>
   }
 
   public sealed interface Renderable : MarkdownNode {
@@ -27,8 +30,4 @@ public sealed interface MarkdownNode {
   public interface Code : Group
   public interface List : Group
   public interface Footnote : Group
-
-  public companion object {
-    public const val INDENT_MARK: String = "    "
-  }
 }

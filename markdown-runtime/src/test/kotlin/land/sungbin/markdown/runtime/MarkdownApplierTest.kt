@@ -89,7 +89,7 @@ class MarkdownApplierTest {
     val failure = assertFailure {
       buffer.markdown {
         ComposeNode<MarkdownNode, MarkdownApplier>(
-          factory = { MarkdownLayoutNode(Buffer()) },
+          factory = { MarkdownCanvas(Buffer()) },
           update = {},
         )
       }

@@ -11,14 +11,17 @@ import androidx.compose.runtime.Applier
 import androidx.compose.runtime.collection.MutableVector
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
+import okio.Buffer
 
 // AbstractApplier uses MutableList, but I want to use MutableVector.
 internal class MarkdownApplier(private val root: MarkdownNode.Root) : Applier<MarkdownNode> {
-  // TODO consider whether a capacity of 50 is the best default value
-  private val stack = MutableVector<MarkdownNode>(capacity = 50).apply { add(root) }
+  private val stack = MutableVector<MarkdownNode>(capacity = 10).apply { add(root) }
   override var current: MarkdownNode = root
 
-  constructor(buffer: MutableList<MarkdownSource>) : this(MarkdownLayoutNode(buffer))
+  private val textBuffer = Buffer()
+
+  constructor(contents: MutableVector<MarkdownSource>, footnotes: MutableVector<MarkdownSource>) :
+    this(MarkdownCanvas(contents, footnotes))
 
   override fun insertTopDown(index: Int, instance: MarkdownNode) {
     assertNotNestedRoot(instance)
@@ -34,7 +37,7 @@ internal class MarkdownApplier(private val root: MarkdownNode.Root) : Applier<Ma
         current.insert(index, instance)
       }
       is MarkdownNode.Root -> Unit // Root is handled by up().
-      is MarkdownNode.Text -> error("Text node cannot have children.")
+      is MarkdownNode.Text -> runtimeError { "Text node cannot have children." }
     }
   }
 
@@ -44,7 +47,7 @@ internal class MarkdownApplier(private val root: MarkdownNode.Root) : Applier<Ma
   }
 
   override fun up() {
-    check(stack.isNotEmpty()) { "stack is empty. cannot up()" }
+    runtimeCheck(stack.isNotEmpty()) { "stack is empty. cannot up()" }
 
     val tail = current
     assertNotNestedRoot(tail)
@@ -53,15 +56,21 @@ internal class MarkdownApplier(private val root: MarkdownNode.Root) : Applier<Ma
     current = stack.last()
 
     val current = current
-    if (current !is MarkdownNode.Root) return
+
+    fun addToCurrentDestination(node: MarkdownNode.Renderable) {
+      when (current) {
+        is MarkdownNode.Root -> {
+          if (node is MarkdownNode.Footnote) current.footnotes.add(node.render())
+          else current.contents.add(node.render())
+        }
+        is MarkdownNode.Group -> current.insert(current.size, node)
+        is MarkdownNode.Text -> runtimeError { "Text node cannot have children." }
+      }
+    }
 
     when (tail) {
-      is MarkdownNode.Text -> current.buffer.add(tail.render())
-      is MarkdownNode.Group -> {
-        repeat(tail.size) {
-          current.buffer.add(tail.render())
-        }
-      }
+      is MarkdownNode.Text -> textBuffer.writeUtf8(tail.render())
+      is MarkdownNode.Group -> repeat(tail.size) { addToCurrentDestination(tail) }
     }
   }
 
@@ -75,10 +84,8 @@ internal class MarkdownApplier(private val root: MarkdownNode.Root) : Applier<Ma
 
   override fun clear() {
     val current = current
-    if (current !is MarkdownNode.Root) {
-      error("Unexpected clear() call on non-root node.")
-    }
-    current.buffer.add(MarkdownSource.END_DOCUMENT)
+    runtimeCheck(current is MarkdownNode.Root) { "Unexpected clear() call on non-root node." }
+    current.contents.add(MarkdownSource.END_DOCUMENT)
   }
 
   override fun insertBottomUp(index: Int, instance: MarkdownNode) {
@@ -88,14 +95,11 @@ internal class MarkdownApplier(private val root: MarkdownNode.Root) : Applier<Ma
   @OptIn(ExperimentalContracts::class)
   private fun assertNotNestedRoot(node: MarkdownNode) {
     contract { returns() implies (node is MarkdownNode.Renderable) }
-    if (node is MarkdownNode.Root) {
-      throw NotImplementedError("Nested markdown root is not supported.")
-    }
+    check(node !is MarkdownNode.Root) { "Nested markdown root is not supported." }
   }
 
   private fun notSupportedOperation(operation: String): Nothing =
     throw NotImplementedError(
-      "Operation $operation is not supported. Dynamic layouts are not currently " +
-        "supported. (Did you try recomposition?)",
+      "Dynamic layouts('$operation' operations) are not currently supported. Did you try recomposition?",
     )
 }
