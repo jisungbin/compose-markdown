@@ -1,3 +1,10 @@
+/*
+ * Developed by Ji Sungbin 2024.
+ *
+ * Licensed under the MIT.
+ * Please see full license: https://github.com/jisungbin/compose-markdown/blob/main/LICENSE
+ */
+
 package land.sungbin.markdown.runtime
 
 import kotlin.contracts.ExperimentalContracts
@@ -13,5 +20,5 @@ internal inline fun runtimeError(message: () -> String): Nothing =
   error(
     "Problem with compose-markdown runtime. Please check the GitHub issue for the same issue, " +
       "or register a new one. (https://github.com/jisungbin/compose-markdown/issues)\n" +
-      message()
+      message(),
   )

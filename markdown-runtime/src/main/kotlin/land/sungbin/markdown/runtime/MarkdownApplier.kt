@@ -9,36 +9,30 @@ package land.sungbin.markdown.runtime
 
 import androidx.compose.runtime.Applier
 import androidx.compose.runtime.collection.MutableVector
-import kotlin.contracts.ExperimentalContracts
-import kotlin.contracts.contract
-import okio.Buffer
 
 // AbstractApplier uses MutableList, but I want to use MutableVector.
-internal class MarkdownApplier(private val root: MarkdownNode.Root) : Applier<MarkdownNode> {
+public class MarkdownApplier internal constructor(
+  private val options: MarkdownOptions,
+  private val root: MarkdownNode = MarkdownNode(kind = MarkdownKind.GROUP),
+  private val footnotes: MarkdownNode = MarkdownNode(kind = MarkdownKind.GROUP),
+) : Applier<MarkdownNode> {
   private val stack = MutableVector<MarkdownNode>(capacity = 10).apply { add(root) }
   override var current: MarkdownNode = root
 
-  private val textBuffer = Buffer()
-
-  constructor(contents: MutableVector<MarkdownSource>, footnotes: MutableVector<MarkdownSource>) :
-    this(MarkdownCanvas(contents, footnotes))
+  init {
+    require(root.group) { "Root node must be a group." }
+    require(footnotes.group) { "Footnotes node must be a group." }
+  }
 
   override fun insertTopDown(index: Int, instance: MarkdownNode) {
-    assertNotNestedRoot(instance)
+    runtimeCheck(!current.text) { "Cannot add children to a text node." }
 
-    when (val current = current) {
-      is MarkdownNode.Group -> {
-        if (instance is MarkdownNode.Footnote && current is MarkdownNode.Footnote) {
-          throw MarkdownException("Footnote cannot be nested.")
-        }
-        if (instance is MarkdownNode.Code && current is MarkdownNode.Code) {
-          throw MarkdownException("Code cannot be nested.")
-        }
-        current.insert(index, instance)
-      }
-      is MarkdownNode.Root -> Unit // Root is handled by up().
-      is MarkdownNode.Text -> runtimeError { "Text node cannot have children." }
+    if (current.footnote && instance.footnote) {
+      throw MarkdownException("Footnotes cannot be nested.")
     }
+
+    instance.index = index
+    current.children.add(instance.draw(options = options, parentTag = current.tag(options)))
   }
 
   override fun down(node: MarkdownNode) {
@@ -47,59 +41,43 @@ internal class MarkdownApplier(private val root: MarkdownNode.Root) : Applier<Ma
   }
 
   override fun up() {
-    runtimeCheck(stack.isNotEmpty()) { "stack is empty. cannot up()" }
+    runtimeCheck(stack.isNotEmpty()) { "stack is empty. cannot up()." }
 
     val tail = current
-    assertNotNestedRoot(tail)
 
     stack.removeAt(stack.lastIndex)
     current = stack.last()
 
-    val current = current
+    if (tail.text) return // text can't be a group, so at this point it's already child of current.
+    val children = tail.draw(options = options, parentTag = if (current.footnote) "" else current.tag(options))
 
-    fun addToCurrentDestination(node: MarkdownNode.Renderable) {
-      when (current) {
-        is MarkdownNode.Root -> {
-          if (node is MarkdownNode.Footnote) current.footnotes.add(node.render())
-          else current.contents.add(node.render())
-        }
-        is MarkdownNode.Group -> current.insert(current.size, node)
-        is MarkdownNode.Text -> runtimeError { "Text node cannot have children." }
-      }
-    }
-
-    when (tail) {
-      is MarkdownNode.Text -> textBuffer.writeUtf8(tail.render())
-      is MarkdownNode.Group -> repeat(tail.size) { addToCurrentDestination(tail) }
+    when {
+      current.text -> runtimeError { "Text nodes cannot have children." }
+      current.group -> current.children.add(children)
+      current.footnote -> footnotes.children.add(children)
     }
   }
 
-  override fun move(from: Int, to: Int, count: Int) {
-    notSupportedOperation("move")
+  override fun clear() {
+    val current = current
+    runtimeCheck(current === root) { "Unexpected clear() call on non-root node." }
+  }
+
+  override fun insertBottomUp(index: Int, instance: MarkdownNode) {
+    // Ignored. Creating markdown is ideally top-down.
   }
 
   override fun remove(index: Int, count: Int) {
     notSupportedOperation("remove")
   }
 
-  override fun clear() {
-    val current = current
-    runtimeCheck(current is MarkdownNode.Root) { "Unexpected clear() call on non-root node." }
-    current.contents.add(MarkdownSource.END_DOCUMENT)
-  }
-
-  override fun insertBottomUp(index: Int, instance: MarkdownNode) {
-    // Ignored. We use TopDown.
-  }
-
-  @OptIn(ExperimentalContracts::class)
-  private fun assertNotNestedRoot(node: MarkdownNode) {
-    contract { returns() implies (node is MarkdownNode.Renderable) }
-    check(node !is MarkdownNode.Root) { "Nested markdown root is not supported." }
+  override fun move(from: Int, to: Int, count: Int) {
+    notSupportedOperation("move")
   }
 
   private fun notSupportedOperation(operation: String): Nothing =
     throw NotImplementedError(
-      "Dynamic layouts('$operation' operations) are not currently supported. Did you try recomposition?",
+      "Dynamic layouts('$operation' operations) are not currently supported. " +
+        "Try removing recomposition occurrences.",
     )
 }
