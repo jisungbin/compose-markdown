@@ -1,3 +1,10 @@
+/*
+ * Developed by Ji Sungbin 2024.
+ *
+ * Licensed under the MIT.
+ * Please see full license: https://github.com/jisungbin/compose-markdown/blob/main/LICENSE
+ */
+
 package land.sungbin.markdown.ui.modifier
 
 import assertk.assertThat
@@ -52,8 +59,8 @@ class ModifierTest {
     assertThat(Modifier).isSameInstanceAs(Modifier)
   }
 
-  private val testModifier1 = TextTransformer { it }
-  private val testModifier2 = TextTransformer { it }
-  private val testModifier3 = TextTransformer { it }
-  private val testModifier4 = TextTransformer { it }
+  private val testModifier1 = TextTransformer { _, sink -> sink }
+  private val testModifier2 = TextTransformer { _, sink -> sink }
+  private val testModifier3 = TextTransformer { _, sink -> sink }
+  private val testModifier4 = TextTransformer { _, sink -> sink }
 }

@@ -1,3 +1,10 @@
+/*
+ * Developed by Ji Sungbin 2024.
+ *
+ * Licensed under the MIT.
+ * Please see full license: https://github.com/jisungbin/compose-markdown/blob/main/LICENSE
+ */
+
 package land.sungbin.markdown.ui.image
 
 import androidx.compose.runtime.Composable
@@ -38,4 +45,3 @@ public inline fun Image(
 ) {
   Text(modifier = modifier, value = ImageText(url, size, alt))
 }
-

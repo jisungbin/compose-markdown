@@ -1,24 +1,16 @@
+/*
+ * Developed by Ji Sungbin 2024.
+ *
+ * Licensed under the MIT.
+ * Please see full license: https://github.com/jisungbin/compose-markdown/blob/main/LICENSE
+ */
+
 package land.sungbin.markdown.ui.text
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.NonRestartableComposable
 import land.sungbin.markdown.runtime.MarkdownComposable
-import land.sungbin.markdown.ui.bufferOf
 import land.sungbin.markdown.ui.modifier.Modifier
-import okio.BufferedSource
-
-@PublishedApi
-internal class HeaderText(level: Int, value: BufferedSource) : AbstractText() {
-  init {
-    require(level in 1..6) { "Header level should be in 1..6" }
-
-    sink {
-      repeat(level) { writeByte('#'.code) }
-      writeByte(' '.code)
-      writeAll(value)
-    }
-  }
-}
 
 @Suppress("NOTHING_TO_INLINE")
 @[Composable NonRestartableComposable MarkdownComposable]
@@ -27,10 +19,7 @@ public inline fun Header(
   text: CharSequence,
   modifier: Modifier = Modifier,
 ) {
-  Text(
-    modifier = modifier,
-    value = HeaderText(level, value = bufferOf(text)),
-  )
+  Text(modifier = modifier, value = "${"#".repeat(level)} $text")
 }
 
 @Suppress("NOTHING_TO_INLINE")

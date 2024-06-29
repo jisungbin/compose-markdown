@@ -1,12 +1,20 @@
+/*
+ * Developed by Ji Sungbin 2024.
+ *
+ * Licensed under the MIT.
+ * Please see full license: https://github.com/jisungbin/compose-markdown/blob/main/LICENSE
+ */
+
 package land.sungbin.markdown.ui.text
 
 import androidx.compose.runtime.Immutable
+import land.sungbin.markdown.runtime.MarkdownOptions
 import land.sungbin.markdown.ui.bufferCursor
 import okio.BufferedSink
 
 @Immutable
 public data class TextStyleDefinition(public val open: String, public val end: String = open) : TextTransformer {
-  override fun transform(sink: BufferedSink): BufferedSink = sink.apply {
+  override fun transform(options: MarkdownOptions, sink: BufferedSink): BufferedSink = sink.apply {
     buffer.readAndWriteUnsafe(bufferCursor).use { cursor ->
       val previousSize = cursor.resizeBuffer(buffer.size + open.length + end.length)
       cursor.seek(0)

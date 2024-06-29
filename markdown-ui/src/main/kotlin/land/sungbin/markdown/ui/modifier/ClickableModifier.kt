@@ -1,4 +1,12 @@
+/*
+ * Developed by Ji Sungbin 2024.
+ *
+ * Licensed under the MIT.
+ * Please see full license: https://github.com/jisungbin/compose-markdown/blob/main/LICENSE
+ */
+
 package land.sungbin.markdown.ui.modifier
 
-// TODO Modifier.clickable(range: (String) -> IntRange, link: String)
-//  Modifier support in runtime needs to be added, baseUrl option needs to be added.
+public fun Modifier.clickable(range: (String) -> IntRange, link: String): Modifier {
+  TODO()
+}
