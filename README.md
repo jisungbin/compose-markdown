@@ -1,7 +1,7 @@
 ## Compose Markdown
 
 ```kotlin
-StringBuilder().markdown {
+Buffer().markdown {
   H1("Hello, Compose-Markdown!")
   Quote(
     modifier = Modifier.clickable(link = "https://github.com/jisungbin/compose-markdown"),
@@ -17,3 +17,7 @@ StringBuilder().markdown {
 ```
 
 WIP
+
+### Limitations
+
+- Text larger than 8 KB might not output properly.

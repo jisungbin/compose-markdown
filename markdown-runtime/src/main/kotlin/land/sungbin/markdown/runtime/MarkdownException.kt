@@ -7,10 +7,7 @@
 
 package land.sungbin.markdown.runtime
 
-public data class MarkdownOptions(
-  public val defaultLanguage: String = "",
-) {
-  public companion object {
-    public val Default: MarkdownOptions = MarkdownOptions()
-  }
-}
+public open class MarkdownException(
+  override val message: String? = null,
+  override val cause: Throwable? = null,
+) : RuntimeException()

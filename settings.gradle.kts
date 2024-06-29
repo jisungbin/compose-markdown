@@ -9,6 +9,9 @@
 
 rootProject.name = "compose-markdown"
 
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+enableFeaturePreview("STABLE_CONFIGURATION_CACHE")
+
 pluginManagement {
   repositories {
     google {
@@ -30,4 +33,7 @@ dependencyResolutionManagement {
   }
 }
 
-include(":markdown-runtime")
+include(
+  ":markdown-runtime",
+  ":markdown-ui",
+)

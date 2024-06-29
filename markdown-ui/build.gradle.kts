@@ -15,11 +15,11 @@ kotlin {
 }
 
 dependencies {
-  implementation(libs.androidx.annotation)
   implementation(libs.compose.runtime)
+  implementation(libs.compose.uiutil)
+  implementation(libs.androidx.annotation)
 
-  api(libs.okio)
-  api(libs.kotlin.coroutines)
+  implementation(projects.markdownRuntime)
 
   testImplementation(kotlin("test-junit5"))
   testImplementation(libs.test.assertk)

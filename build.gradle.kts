@@ -15,6 +15,13 @@ plugins {
   alias(libs.plugins.spotless) apply false
   alias(libs.plugins.kotlin.dokka) apply false
   alias(libs.plugins.gradle.publish.maven) apply false
+  idea
+}
+
+idea {
+  module {
+    excludeDirs = excludeDirs + allprojects.map { it.file(".kotlin") }
+  }
 }
 
 buildscript {
