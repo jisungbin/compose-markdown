@@ -24,14 +24,15 @@ public inline fun Code(
   ComposeNode<MarkdownNode, MarkdownApplier>(
     factory = {
       MarkdownNode(
-        kind = MarkdownKind.GROUP + MarkdownKind.CONSUMING_TAG,
-        tag = { _, options -> "```${language ?: options.defaultLanguage}" },
+        kind = MarkdownKind.GROUP,
+        contentKind = MarkdownKind.TEXT,
+        contentTag = { _, options -> "```${language ?: options.defaultLanguage}" + '\n' },
       )
     },
     update = EmptyUpdater,
     content = {
       content()
-      Text("```")
+      Text('\n' + "```")
     },
   )
 }

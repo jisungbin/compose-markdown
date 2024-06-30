@@ -12,7 +12,6 @@ import androidx.compose.runtime.collection.MutableVector
 
 // AbstractApplier uses MutableList, but I want to use MutableVector.
 public class MarkdownApplier internal constructor(
-  private val options: MarkdownOptions,
   private val root: MarkdownNode = MarkdownNode(kind = MarkdownKind.GROUP),
   private val footnotes: MarkdownNode = MarkdownNode(kind = MarkdownKind.GROUP),
 ) : Applier<MarkdownNode> {
@@ -32,7 +31,7 @@ public class MarkdownApplier internal constructor(
     }
 
     instance.index = index
-    current.children.add(instance.draw(options = options, parentTag = current.tag(options)))
+    current.children.add(instance)
   }
 
   override fun down(node: MarkdownNode) {
@@ -49,12 +48,10 @@ public class MarkdownApplier internal constructor(
     current = stack.last()
 
     if (tail.text) return // text can't be a group, so at this point it's already child of current.
-    val children = tail.draw(options = options, parentTag = if (current.footnote) "" else current.tag(options))
-
     when {
       current.text -> runtimeError { "Text nodes cannot have children." }
-      current.group -> current.children.add(children)
-      current.footnote -> footnotes.children.add(children)
+      current.group -> current.children.add(tail)
+      current.footnote -> footnotes.children.add(tail)
     }
   }
 

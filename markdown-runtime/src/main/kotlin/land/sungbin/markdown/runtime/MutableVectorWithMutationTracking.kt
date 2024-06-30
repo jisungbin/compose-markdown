@@ -14,14 +14,12 @@ import androidx.compose.runtime.collection.MutableVector
  * On mutation, the [onVectorMutated] lambda will be invoked.
  */
 // Source: https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:compose/ui/ui/src/commonMain/kotlin/androidx/compose/ui/node/MutableVectorWithMutationTracking.kt;l=25;drc=dcaa116fbfda77e64a319e1668056ce3b032469f
+@Suppress("NOTHING_TO_INLINE")
 internal class MutableVectorWithMutationTracking<T>(
   internal val vector: MutableVector<T>,
   private val onVectorMutated: () -> Unit,
 ) {
-  fun add(element: T) {
-    vector.add(element)
-    onVectorMutated()
-  }
-
+  inline fun add(element: T) = vector.add(element).also { onVectorMutated() }
+  inline fun clear() = if (vector.isNotEmpty()) vector.clear().also { onVectorMutated() } else Unit
   inline fun forEach(block: (T) -> Unit) = vector.forEach(block)
 }

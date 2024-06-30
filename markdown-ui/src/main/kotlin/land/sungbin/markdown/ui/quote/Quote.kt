@@ -21,8 +21,9 @@ public inline fun Quote(content: @Composable @MarkdownComposable () -> Unit) {
   ComposeNode<MarkdownNode, MarkdownApplier>(
     factory = {
       MarkdownNode(
-        kind = MarkdownKind.GROUP + MarkdownKind.REPEATION_TAG + MarkdownKind.RESPECT_PARENT_TAG,
-        tag = { _, _ -> "> " },
+        kind = MarkdownKind.GROUP,
+        contentKind = MarkdownKind.REPEATATION_PARENT_TAG,
+        contentTag = { _, _ -> "> " },
       )
     },
     update = EmptyUpdater,
