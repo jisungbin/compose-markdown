@@ -13,9 +13,7 @@ import land.sungbin.markdown.ui.text.TextTransformer
 import okio.BufferedSink
 
 @Stable
-public sealed interface Modifier :
-  Collection<TextTransformer>,
-  RandomAccess {
+public sealed interface Modifier : Collection<TextTransformer>, RandomAccess {
   public operator fun get(index: Int): TextTransformer
   public override fun hashCode(): Int
   public override fun equals(other: Any?): Boolean
@@ -26,9 +24,7 @@ public sealed interface Modifier :
   }
 }
 
-private class MutableModifier :
-  AbstractMutableCollection<TextTransformer>(),
-  Modifier {
+private class MutableModifier : AbstractMutableCollection<TextTransformer>(), Modifier {
   private val transformers = ArrayList<TextTransformer>()
 
   override fun add(element: TextTransformer): Boolean = transformers.add(element)
