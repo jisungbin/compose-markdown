@@ -48,7 +48,7 @@ public suspend fun markdown(
     var composition: Composition? = null
     try {
       withRunningRecomposer { recomposer ->
-        composition = Composition(MarkdownApplier(options, root, footnotes), parent = recomposer).apply {
+        composition = Composition(MarkdownApplier(root, footnotes), parent = recomposer).apply {
           setContent {
             when (parentLocals) {
               null -> content()
@@ -68,7 +68,10 @@ public suspend fun markdown(
   job.cancelAndJoin()
 
   return buildString {
-    appendLine(root.draw(parentTag = ""))
-    append(footnotes.draw(parentTag = ""))
+    appendLine(root.draw(options))
+    append(footnotes.draw(options))
+  }.also {
+    root.close()
+    footnotes.close()
   }
 }
