@@ -11,17 +11,34 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.util.fastFold
 import land.sungbin.markdown.runtime.MarkdownOptions
-import okio.Buffer
 
 @Immutable
-public data class AnnotatedString(public val styledTexts: List<TextAndStyle>) : AbstractText() {
-  init {
-    val styled = styledTexts.fastFold(Buffer()) { acc, (text, style) ->
-      val styled = style.transform(MarkdownOptions.Default, bufferOf(text))
-      acc.apply { writeAll(styled.buffer) }
-    }
-    sink { writeAll(styled) }
+public class AnnotatedString(@Suppress("MemberVisibilityCanBePrivate") public val styledTexts: List<TextAndStyle>) : CharSequence {
+  private val backing = run {
+    styledTexts
+      .fastFold(StringBuilder()) { acc, (text, style) ->
+        val styled = style.transform(MarkdownOptions.Default, text.toString())
+        acc.append(styled)
+      }
+      .toString()
   }
+
+  override val length: Int = backing.length
+
+  override fun get(index: Int): Char = backing[index]
+
+  override fun subSequence(startIndex: Int, endIndex: Int): CharSequence =
+    backing.subSequence(startIndex, endIndex)
+
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other !is CharSequence) return false
+    return backing == other.toString()
+  }
+
+  override fun hashCode(): Int = backing.hashCode()
+
+  override fun toString(): String = backing
 
   @Immutable
   public data class TextAndStyle(
@@ -43,11 +60,6 @@ public data class AnnotatedString(public val styledTexts: List<TextAndStyle>) : 
 
     @PublishedApi
     internal fun build(): AnnotatedString = AnnotatedString(texts)
-  }
-
-  private fun bufferOf(value: CharSequence): Buffer {
-    if (value is AbstractText) return value.buffer.clone()
-    return Buffer().writeUtf8(value.toString())
   }
 }
 

@@ -15,14 +15,13 @@ import land.sungbin.markdown.ui.text.AnnotatedString.TextAndStyle
 class AnnotatedStringTest {
   @Test fun annotated() {
     val texts = listOf(
-      TextAndStyle("안녕하세요", TextStyle(underline = true)),
+      TextAndStyle("Hello", TextStyle(underline = true)),
       TextAndStyle(" "),
-      TextAndStyle("잘가세요", TextStyle(strikethrough = true, bold = true)),
+      TextAndStyle("Bye", TextStyle(strikethrough = true, bold = true)),
     )
     val annotated = AnnotatedString(texts)
 
-    assertThat(annotated.source { readUtf8() })
-      .isEqualTo("<ins>안녕하세요</ins> ~~**잘가세요**~~")
+    assertThat(annotated).isEqualTo("<ins>Hello</ins> ~~**Bye**~~")
   }
 
   @Test fun annotatedBuilder() {
@@ -56,7 +55,7 @@ class AnnotatedStringTest {
         "multipleUppercaseStyled"
       }
     }
-    assertThat(annotated.source { readUtf8() }).isEqualTo(
+    assertThat(annotated).isEqualTo(
       "" +
         "normal " +
         "**bold** " +

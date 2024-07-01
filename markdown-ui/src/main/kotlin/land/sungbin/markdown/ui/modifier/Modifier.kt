@@ -10,7 +10,6 @@ package land.sungbin.markdown.ui.modifier
 import androidx.compose.runtime.Stable
 import land.sungbin.markdown.runtime.MarkdownOptions
 import land.sungbin.markdown.ui.text.TextTransformer
-import okio.BufferedSink
 
 @Stable
 public sealed interface Modifier : Collection<TextTransformer>, RandomAccess {
@@ -45,9 +44,9 @@ public infix fun Modifier.then(transformer: TextTransformer): Modifier {
 
 // TODO not cloning the sink -> Documentation required
 @PublishedApi
-internal fun Modifier.applyTo(options: MarkdownOptions, sink: BufferedSink): BufferedSink {
-  if (isEmpty()) return sink
-  var acc = sink
+internal fun Modifier.applyTo(options: MarkdownOptions, value: String): String {
+  if (isEmpty()) return value
+  var acc = value
   repeat(size) { index -> acc = get(index).transform(options, acc) }
   return acc
 }

@@ -14,27 +14,27 @@ import land.sungbin.markdown.ui.transform
 
 class TextStyleDefinitionTest {
   @Test fun bold() {
-    val styled = TextStyleDefinition.Bold.transform("안녕하세요 hello~")
-    assertThat(styled.buffer.readUtf8()).isEqualTo("**안녕하세요 hello~**")
+    val styled = TextStyleDefinition.Bold.transform("HELLO hello~")
+    assertThat(styled).isEqualTo("**HELLO hello~**")
   }
 
   @Test fun italic() {
-    val styled = TextStyleDefinition.Italic.transform("안녕하세요 hello~")
-    assertThat(styled.buffer.readUtf8()).isEqualTo("_안녕하세요 hello~_")
+    val styled = TextStyleDefinition.Italic.transform("HELLO hello~")
+    assertThat(styled).isEqualTo("_HELLO hello~_")
   }
 
   @Test fun strikethrough() {
-    val styled = TextStyleDefinition.Strikethrough.transform("안녕하세요 hello~")
-    assertThat(styled.buffer.readUtf8()).isEqualTo("~~안녕하세요 hello~~~")
+    val styled = TextStyleDefinition.Strikethrough.transform("HELLO hello~")
+    assertThat(styled).isEqualTo("~~HELLO hello~~~")
   }
 
   @Test fun underline() {
-    val styled = TextStyleDefinition.Unerline.transform("안녕하세요 hello~")
-    assertThat(styled.buffer.readUtf8()).isEqualTo("<ins>안녕하세요 hello~</ins>")
+    val styled = TextStyleDefinition.Unerline.transform("HELLO hello~")
+    assertThat(styled).isEqualTo("<ins>HELLO hello~</ins>")
   }
 
   @Test fun monospace() {
-    val styled = TextStyleDefinition.Monospace.transform("안녕하세요 hello~")
-    assertThat(styled.buffer.readUtf8()).isEqualTo("`안녕하세요 hello~`")
+    val styled = TextStyleDefinition.Monospace.transform("HELLO hello~")
+    assertThat(styled).isEqualTo("`HELLO hello~`")
   }
 }

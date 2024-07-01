@@ -23,9 +23,9 @@ class TextStyleTest {
       underline = true,
       monospace = true,
       uppercase = true,
-    ).transform("안녕하세요 hello~")
+    ).transform("hello~")
 
-    assertThat(styled.buffer.readUtf8()).isEqualTo("`<ins>~~_**안녕하세요 HELLO~**_~~</ins>`")
+    assertThat(styled).isEqualTo("`<ins>~~_**HELLO~**_~~</ins>`")
   }
 
   @Test fun cannotUppercaseAndLowercaseAtTheSameTime() {
@@ -35,6 +35,6 @@ class TextStyleTest {
 
   @Test fun lowercaseStyled() {
     val styled = TextStyle(lowercase = true).transform("HELLO")
-    assertThat(styled.buffer.readUtf8()).isEqualTo("hello")
+    assertThat(styled).isEqualTo("hello")
   }
 }

@@ -9,9 +9,8 @@ package land.sungbin.markdown.ui.text
 
 import androidx.compose.runtime.Immutable
 import land.sungbin.markdown.runtime.MarkdownOptions
-import okio.BufferedSink
 
 @Immutable
 public fun interface TextTransformer {
-  public fun transform(options: MarkdownOptions, sink: BufferedSink): BufferedSink
+  public fun transform(options: MarkdownOptions, value: String): String
 }
