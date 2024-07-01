@@ -12,19 +12,17 @@ import androidx.compose.runtime.collection.MutableVector
 
 // AbstractApplier uses MutableList, but I want to use MutableVector.
 public class MarkdownApplier internal constructor(
-  private val root: MarkdownNode = MarkdownNode(kind = MarkdownKind.GROUP),
-  private val footnotes: MarkdownNode = MarkdownNode(kind = MarkdownKind.GROUP),
+  private val root: MarkdownNode = MarkdownNode(kind = MarkdownKind.GROUP, contentTag = { "" }),
 ) : Applier<MarkdownNode> {
   private val stack = MutableVector<MarkdownNode>(capacity = 10).apply { add(root) }
   override var current: MarkdownNode = root
 
   init {
     require(root.group) { "Root node must be a group." }
-    require(footnotes.group) { "Footnotes node must be a group." }
   }
 
   override fun insertTopDown(index: Int, instance: MarkdownNode) {
-    runtimeCheck(!current.text) { "Cannot add children to a text node." }
+    check(!current.text) { "Cannot add children to a text node." }
 
     if (current.footnote && instance.footnote) {
       throw MarkdownException("Footnotes cannot be nested.")
@@ -40,19 +38,9 @@ public class MarkdownApplier internal constructor(
   }
 
   override fun up() {
-    runtimeCheck(stack.isNotEmpty()) { "stack is empty. cannot up()." }
-
-    val tail = current
-
+    check(stack.size > 1) { "stack is root. cannot up()." }
     stack.removeAt(stack.lastIndex)
     current = stack.last()
-
-    if (tail.text) return // text can't be a group, so at this point it's already child of current.
-    when {
-      current.text -> runtimeError { "Text nodes cannot have children." }
-      current.group -> current.children.add(tail)
-      current.footnote -> footnotes.children.add(tail)
-    }
   }
 
   override fun clear() {

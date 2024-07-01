@@ -23,32 +23,27 @@ import kotlinx.coroutines.withContext
 
 @Suppress("NOTHING_TO_INLINE")
 @Composable
-public inline fun markdown(
-  options: MarkdownOptions = MarkdownOptions.Default,
-  noinline content: @MarkdownComposable @Composable () -> Unit,
-): String {
+public inline fun Markdown(noinline content: @MarkdownComposable @Composable () -> Unit): String {
   val scope = rememberCoroutineScope()
   val locals = currentCompositionLocalContext
   return runBlocking(scope.coroutineContext) {
-    markdown(options = options, parentLocals = locals, content = content)
+    markdown(parentLocals = locals, content = content)
   }
 }
 
 public suspend fun markdown(
-  options: MarkdownOptions = MarkdownOptions.Default,
   parentLocals: CompositionLocalContext? = null,
   content: @MarkdownComposable @Composable () -> Unit,
 ): String {
   val job = Job(parent = coroutineContext[Job])
   val composeContext = coroutineContext + ImmediatelyFrameClock + job
-  val root = MarkdownNode(kind = MarkdownKind.GROUP)
-  val footnotes = MarkdownNode(kind = MarkdownKind.GROUP)
+  val root = MarkdownNode(kind = MarkdownKind.GROUP, contentTag = { "" })
 
   withContext(context = composeContext) {
     var composition: Composition? = null
     try {
       withRunningRecomposer { recomposer ->
-        composition = Composition(MarkdownApplier(root, footnotes), parent = recomposer).apply {
+        composition = Composition(MarkdownApplier(root), parent = recomposer).apply {
           setContent {
             when (parentLocals) {
               null -> content()
@@ -68,7 +63,19 @@ public suspend fun markdown(
   job.cancelAndJoin()
 
   return buildString {
-    appendLine(root.draw(options))
-    append(footnotes.draw(options))
+    val footnotes = mutableListOf<String>()
+    root.children.vector.forEach { child ->
+      when {
+        child.footnote -> footnotes += child.draw()
+        else -> {
+          if (!isEmpty()) append('\n')
+          append(child.draw())
+        }
+      }
+    }
+    if (footnotes.isNotEmpty()) {
+      if (!isEmpty()) append("\n\n")
+      append(footnotes.joinToString("\n"))
+    }
   }
 }

@@ -10,7 +10,6 @@ package land.sungbin.markdown.ui.modifier
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import kotlin.test.Test
-import land.sungbin.markdown.ui.transform
 
 class ClickableTransformerTest {
   @Test fun clickableRangeStartsWithZero() {

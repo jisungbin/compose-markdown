@@ -9,21 +9,16 @@ package land.sungbin.markdown.ui.text
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
-import androidx.compose.ui.util.fastFold
-import land.sungbin.markdown.runtime.MarkdownOptions
 
 @Immutable
 public class AnnotatedString(
   @Suppress("MemberVisibilityCanBePrivate") public val styledTexts: List<TextAndStyle>,
 ) : CharSequence {
-  private val backing = run {
-    styledTexts
-      .fastFold(StringBuilder()) { acc, (text, style) ->
-        val styled = style.transform(MarkdownOptions.Default, text.toString())
-        acc.append(styled)
-      }
-      .toString()
+  private val backing = styledTexts.fold(StringBuilder()) { acc, (text, style) ->
+    val styled = style.transform(text.toString())
+    acc.append(styled)
   }
+    .toString()
 
   override val length: Int = backing.length
 

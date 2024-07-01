@@ -8,11 +8,10 @@
 package land.sungbin.markdown.ui.text
 
 import androidx.compose.runtime.Immutable
-import land.sungbin.markdown.runtime.MarkdownOptions
 
 @Immutable
 public data class TextStyleDefinition(public val open: String, public val end: String = open) : TextTransformer {
-  override fun transform(options: MarkdownOptions, value: String): String =
+  override fun transform(value: String): String =
     value.toCharArray(
       destination = CharArray(open.length + value.length + end.length),
       destinationOffset = open.length,

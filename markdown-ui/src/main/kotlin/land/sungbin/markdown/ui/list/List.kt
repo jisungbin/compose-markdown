@@ -16,6 +16,7 @@ import land.sungbin.markdown.runtime.MarkdownKind
 import land.sungbin.markdown.runtime.MarkdownNode
 import land.sungbin.markdown.ui.EmptyUpdater
 
+// TODO ListScope -> item {}, item {}... -> supports nested list
 @[Composable NonRestartableComposable MarkdownComposable]
 public inline fun List(
   ordered: Boolean = false,
@@ -25,7 +26,7 @@ public inline fun List(
     factory = {
       MarkdownNode(
         kind = MarkdownKind.GROUP,
-        contentTag = { index, _ -> if (ordered) "${index + 1}. " else "- " },
+        contentTag = { index -> if (ordered) "${index + 1}. " else "- " },
       )
     },
     update = EmptyUpdater,

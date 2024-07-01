@@ -10,7 +10,6 @@ package land.sungbin.markdown.ui.modifier
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import land.sungbin.markdown.runtime.MarkdownComposable
-import land.sungbin.markdown.runtime.MarkdownOptions
 import land.sungbin.markdown.ui.text.TextTransformer
 
 private val DefaultFootnotePosition: (String) -> Int = { it.length }
@@ -28,12 +27,11 @@ internal class FootnoteModifier(
   internal val tag: String,
   private val position: (String) -> Int = DefaultFootnotePosition,
 ) : TextTransformer {
-  override fun transform(options: MarkdownOptions, value: String): String =
-    when (val position = position(value)) {
-      0 -> "[^$tag]$value"
-      value.length - 1 -> "$value[^$tag]"
-      else -> value.substring(0, position + 1) + "[^$tag]" + value.substring(position + 1)
-    }
+  override fun transform(value: String): String = when (val position = position(value)) {
+    0 -> "[^$tag]$value"
+    value.length - 1 -> "$value[^$tag]"
+    else -> value.substring(0, position + 1) + "[^$tag]" + value.substring(position + 1)
+  }
 }
 
 internal data class FootnoteGroup(

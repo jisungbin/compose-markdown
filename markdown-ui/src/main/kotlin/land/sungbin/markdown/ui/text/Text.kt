@@ -10,7 +10,6 @@ package land.sungbin.markdown.ui.text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ComposeNode
 import androidx.compose.runtime.NonRestartableComposable
-import androidx.compose.ui.util.fastForEach
 import land.sungbin.markdown.runtime.MarkdownApplier
 import land.sungbin.markdown.runtime.MarkdownComposable
 import land.sungbin.markdown.runtime.MarkdownKind
@@ -23,18 +22,17 @@ import land.sungbin.markdown.ui.modifier.applyTo
 @[Composable NonRestartableComposable MarkdownComposable]
 public fun Text(value: CharSequence, modifier: Modifier = Modifier) {
   ComposeNode<MarkdownNode, MarkdownApplier>(
-    factory = { MarkdownNode(source = { options -> modifier.applyTo(options, value.toString()) }) },
+    factory = { MarkdownNode(value = modifier.applyTo(value.toString())) },
     update = EmptyUpdater,
-    content = {
-      if (modifier is MutableModifier) {
-        modifier.footnotes.fastForEach { (tag, content) ->
-          ComposeNode<MarkdownNode, MarkdownApplier>(
-            factory = { MarkdownNode(kind = MarkdownKind.FOOTNOTE, contentTag = { _, _ -> "[^$tag]: " }) },
-            update = EmptyUpdater,
-            content = content,
-          )
-        }
-      }
-    },
   )
+
+  if (modifier is MutableModifier) {
+    modifier.footnotes.forEach { (tag, content) ->
+      ComposeNode<MarkdownNode, MarkdownApplier>(
+        factory = { MarkdownNode(kind = MarkdownKind.FOOTNOTE, contentTag = { "[^$tag]: " }) },
+        update = EmptyUpdater,
+        content = content,
+      )
+    }
+  }
 }

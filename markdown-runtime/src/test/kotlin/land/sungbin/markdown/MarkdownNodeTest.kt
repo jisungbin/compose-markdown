@@ -14,7 +14,6 @@ import assertk.assertions.isEqualTo
 import kotlin.test.Test
 import land.sungbin.markdown.runtime.MarkdownKind
 import land.sungbin.markdown.runtime.MarkdownNode
-import land.sungbin.markdown.runtime.MarkdownOptions
 
 class MarkdownNodeTest {
   private val worldSource = "Hello, World!\nMorning, World!\nBye, World!"
@@ -30,29 +29,29 @@ class MarkdownNodeTest {
       )
   }
 
-  @Test fun noneLayoutNodeShouldHaveFilledSource() {
+  @Test fun noneLayoutNodeShouldHaveValue() {
     assertFailure { node = MarkdownNode() }
       .hasMessage(
-        "A MarkdownNode has been emitted as a MarkdownKind.TEXT, but the 'source' is null. " +
-          "Use a 'source' containing a markdown string instead of null.",
+        "A MarkdownNode has been emitted as a MarkdownKind.TEXT, but the 'value' is null. " +
+          "Use a 'value' producing a markdown string instead of null.",
       )
   }
 
   @Test fun noneLayoutNodeShouldntHaveContentKind() {
-    assertFailure { node = MarkdownNode(source = { "" }, contentKind = MarkdownKind.TEXT) }
+    assertFailure { node = MarkdownNode(value = "", contentKind = MarkdownKind.TEXT) }
       .hasMessage("A node that is not a group or a footnote cannot have a 'contentKind'.")
   }
 
   @Test fun noneLayoutNodeShouldntHaveContentTag() {
-    assertFailure { node = MarkdownNode(source = { "" }, contentTag = { _, _ -> "" }) }
+    assertFailure { node = MarkdownNode(value = "", contentTag = { "" }) }
       .hasMessage("A node that is not a group or a footnote cannot have a 'contentTag'.")
   }
 
-  @Test fun layoutNodeShouldntHaveSource() {
-    assertFailure { node = MarkdownNode(source = { "" }, kind = MarkdownKind.GROUP) }
+  @Test fun layoutNodeShouldntHaveValue() {
+    assertFailure { node = MarkdownNode(value = "", kind = MarkdownKind.GROUP) }
       .hasMessage(
-        "A node that is a group or a footnote cannot have its own 'source'. " +
-          "Only children are allowed to be the source of a 'source'.",
+        "A node that is a group or a footnote cannot have its own 'value'. " +
+          "Only children are allowed to be the source of a 'value'.",
       )
   }
 
@@ -63,30 +62,30 @@ class MarkdownNodeTest {
 
   @Test fun childrenCanBeAddedOnlyToLayoutNode() {
     assertFailure {
-      node = MarkdownNode(source = { "" })
-      node.children.add(MarkdownNode(source = { "" }))
+      node = MarkdownNode(value = "")
+      node.children.add(MarkdownNode(value = ""))
     }
       .hasMessage("Children can be added only to a group or footnote node.")
   }
 
   @Test fun drawingText() {
-    node = MarkdownNode(source = { worldSource })
+    node = MarkdownNode(value = worldSource)
 
-    assertThat(node.draw(MarkdownOptions()))
+    assertThat(node.draw())
       .isEqualTo("Hello, World!\nMorning, World!\nBye, World!")
   }
 
   @Test fun drawingFootnoteText() {
     node = MarkdownNode(
       children = listOf(
-        MarkdownNode(source = { worldSource }),
-        MarkdownNode(source = { worldSource2 }),
+        MarkdownNode(value = worldSource),
+        MarkdownNode(value = worldSource2),
       ),
       kind = MarkdownKind.FOOTNOTE,
-      contentTag = { _, _ -> "[^T]: " },
+      contentTag = { "[^T]: " },
     )
 
-    assertThat(node.draw(MarkdownOptions()))
+    assertThat(node.draw())
       .isEqualTo(
         "[^T]: Hello, World!\n    Morning, World!\n    Bye, World!\n" +
           "    Hello, World2!\n    Morning, World2!\n    Bye, World2!\n",
@@ -96,15 +95,15 @@ class MarkdownNodeTest {
   @Test fun drawingGroupInRoot() {
     node = MarkdownNode(
       children = listOf(
-        MarkdownNode(source = { worldSource }, kind = MarkdownKind.TEXT),
-        MarkdownNode(source = { worldSource2 }, kind = MarkdownKind.TEXT),
+        MarkdownNode(value = worldSource),
+        MarkdownNode(value = worldSource2),
       ),
       kind = MarkdownKind.GROUP,
       contentKind = MarkdownKind.REPEATATION_PARENT_TAG,
-      contentTag = { _, _ -> "P. " },
+      contentTag = { "P. " },
     )
 
-    assertThat(node.draw(MarkdownOptions()))
+    assertThat(node.draw())
       .isEqualTo(
         "P. Hello, World!\nP. Morning, World!\nP. Bye, World!\n" +
           "P. Hello, World2!\nP. Morning, World2!\nP. Bye, World2!",
@@ -113,24 +112,24 @@ class MarkdownNodeTest {
 
   @Test fun drawingGroupInGroup() {
     val childNode = MarkdownNode(
-      children = listOf(MarkdownNode(source = { worldSource2 }, kind = MarkdownKind.TEXT)),
+      children = listOf(MarkdownNode(value = worldSource2)),
       kind = MarkdownKind.GROUP + MarkdownKind.REPEATATION_PARENT_TAG,
       contentKind = MarkdownKind.REPEATATION_PARENT_TAG,
-      contentTag = { _, _ -> "- " },
+      contentTag = { "- " },
     )
       .apply { index = 1 }
 
     node = MarkdownNode(
       children = listOf(
-        MarkdownNode(source = { worldSource }, kind = MarkdownKind.TEXT),
+        MarkdownNode(value = worldSource),
         childNode,
       ),
       kind = MarkdownKind.GROUP,
       contentKind = MarkdownKind.REPEATATION_PARENT_TAG,
-      contentTag = { _, _ -> "> " },
+      contentTag = { "> " },
     )
 
-    assertThat(node.draw(MarkdownOptions()))
+    assertThat(node.draw())
       .isEqualTo(
         """
           > Hello, World!
@@ -146,32 +145,32 @@ class MarkdownNodeTest {
   @Test fun drawingGroupInNestedGroup() {
     val nestedChildrenNodes = MarkdownNode(
       children = List(3) { actualIndex ->
-        MarkdownNode(source = { "My ordered list!\nMy ordered list's new line!" })
+        MarkdownNode(value = "My ordered list!\nMy ordered list's new line!")
           .apply { index = actualIndex }
       },
       kind = MarkdownKind.GROUP + MarkdownKind.REPEATATION_PARENT_TAG,
-      contentTag = { index, _ -> "${index + 1}. " },
+      contentTag = { index -> "${index + 1}. " },
     )
     val childrenNodes = MarkdownNode(
       children = listOf(
         nestedChildrenNodes,
-        MarkdownNode(source = { worldSource }, kind = MarkdownKind.TEXT),
-        MarkdownNode(source = { worldSource2 }, kind = MarkdownKind.TEXT),
+        MarkdownNode(value = worldSource),
+        MarkdownNode(value = worldSource2),
       ),
       kind = MarkdownKind.GROUP,
       contentKind = MarkdownKind.REPEATATION_PARENT_TAG,
-      contentTag = { _, _ -> "> " },
+      contentTag = { "> " },
     )
     node = MarkdownNode(
       children = listOf(
-        MarkdownNode(source = { "Hello!" }),
+        MarkdownNode(value = "Hello!"),
         childrenNodes,
       ),
       kind = MarkdownKind.GROUP,
-      contentTag = { _, _ -> "" },
+      contentTag = { "" },
     )
 
-    assertThat(node.draw(MarkdownOptions()))
+    assertThat(node.draw())
       .isEqualTo(
         """
         Hello!

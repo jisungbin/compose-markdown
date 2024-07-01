@@ -8,9 +8,8 @@
 package land.sungbin.markdown.ui.text
 
 import androidx.compose.runtime.Immutable
-import land.sungbin.markdown.runtime.MarkdownOptions
 
 @Immutable
 public fun interface TextTransformer {
-  public fun transform(options: MarkdownOptions, value: String): String
+  public fun transform(value: String): String
 }

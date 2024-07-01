@@ -8,8 +8,6 @@
 package land.sungbin.markdown.ui.text
 
 import androidx.compose.runtime.Immutable
-import androidx.compose.ui.util.fastFold
-import land.sungbin.markdown.runtime.MarkdownOptions
 
 @Immutable
 public data class TextStyle(
@@ -35,8 +33,8 @@ public data class TextStyle(
     if (monospace) add(TextStyleDefinition.Monospace)
   }
 
-  override fun transform(options: MarkdownOptions, value: String): String =
-    transformers.fastFold(value) { acc, transformer -> transformer.transform(options, acc) }
+  override fun transform(value: String): String =
+    transformers.fold(value) { acc, transformer -> transformer.transform(acc) }
 
   public companion object {
     public val Default: TextStyle = TextStyle()
@@ -44,9 +42,9 @@ public data class TextStyle(
 }
 
 private object UppercaseTransformer : TextTransformer {
-  override fun transform(options: MarkdownOptions, value: String): String = value.uppercase()
+  override fun transform(value: String): String = value.uppercase()
 }
 
 private object LowercaseTransformer : TextTransformer {
-  override fun transform(options: MarkdownOptions, value: String): String = value.lowercase()
+  override fun transform(value: String): String = value.lowercase()
 }
