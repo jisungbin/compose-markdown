@@ -12,9 +12,8 @@ import androidx.compose.runtime.NonRestartableComposable
 import land.sungbin.markdown.runtime.MarkdownComposable
 import land.sungbin.markdown.ui.modifier.Modifier
 
-@Suppress("NOTHING_TO_INLINE")
 @[Composable NonRestartableComposable MarkdownComposable]
-public inline fun Header(
+public fun Header(
   level: Int,
   text: CharSequence,
   modifier: Modifier = Modifier,

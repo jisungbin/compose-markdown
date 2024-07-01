@@ -10,8 +10,6 @@ package land.sungbin.markdown.ui.text
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.util.fastFold
 import land.sungbin.markdown.runtime.MarkdownOptions
-import land.sungbin.markdown.ui.bufferCursor
-import okio.BufferedSink
 
 @Immutable
 public data class TextStyle(
@@ -37,8 +35,8 @@ public data class TextStyle(
     if (monospace) add(TextStyleDefinition.Monospace)
   }
 
-  override fun transform(options: MarkdownOptions, sink: BufferedSink): BufferedSink =
-    transformers.fastFold(sink) { acc, transformer -> transformer.transform(options, acc) }
+  override fun transform(options: MarkdownOptions, value: String): String =
+    transformers.fastFold(value) { acc, transformer -> transformer.transform(options, acc) }
 
   public companion object {
     public val Default: TextStyle = TextStyle()
@@ -46,37 +44,9 @@ public data class TextStyle(
 }
 
 private object UppercaseTransformer : TextTransformer {
-  private const val UPPER_CASE_OFFSET = ('A'.code - 'a'.code).toByte()
-
-  override fun transform(options: MarkdownOptions, sink: BufferedSink): BufferedSink = sink.apply {
-    buffer.readAndWriteUnsafe(bufferCursor).use { cursor ->
-      cursor.seek(0)
-      repeat(cursor.end) { offset ->
-        cursor.data!![offset] = cursor.data!![offset].uppercase()
-      }
-    }
-  }
-
-  private fun Byte.uppercase(): Byte {
-    if (this !in 'a'.code.toByte()..'z'.code.toByte()) return this
-    return (this + UPPER_CASE_OFFSET).toByte()
-  }
+  override fun transform(options: MarkdownOptions, value: String): String = value.uppercase()
 }
 
 private object LowercaseTransformer : TextTransformer {
-  private const val LOWER_CASE_OFFSET = ('a'.code - 'A'.code).toByte()
-
-  override fun transform(options: MarkdownOptions, sink: BufferedSink): BufferedSink = sink.apply {
-    buffer.readAndWriteUnsafe(bufferCursor).use { cursor ->
-      cursor.seek(0)
-      repeat(cursor.end) { offset ->
-        cursor.data!![offset] = cursor.data!![offset].lowercase()
-      }
-    }
-  }
-
-  private fun Byte.lowercase(): Byte {
-    if (this !in 'A'.code.toByte()..'Z'.code.toByte()) return this
-    return (this + LOWER_CASE_OFFSET).toByte()
-  }
+  override fun transform(options: MarkdownOptions, value: String): String = value.lowercase()
 }

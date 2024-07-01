@@ -14,14 +14,13 @@ import land.sungbin.markdown.ui.unit.FixedSize
 
 class ImageTest {
   @Test fun urlOnly() {
-    val image = ImageText("https://example.com/image.jpg")
-    assertThat(image.source { readUtf8() })
-      .isEqualTo("<img src=\"https://example.com/image.jpg\" />")
+    val image = buildImageText("https://example.com/image.jpg")
+    assertThat(image).isEqualTo("<img src=\"https://example.com/image.jpg\" />")
   }
 
   @Test fun urlAndSize() {
-    val image = ImageText("https://example.com/image.jpg", size = FixedSize(100, 200))
-    assertThat(image.source { readUtf8() }).isEqualTo(
+    val image = buildImageText("https://example.com/image.jpg", size = FixedSize(100, 200))
+    assertThat(image).isEqualTo(
       "<img " +
         "src=\"https://example.com/image.jpg\" " +
         "width=\"100\" height=\"200\" " +
@@ -30,8 +29,8 @@ class ImageTest {
   }
 
   @Test fun urlAndAlt() {
-    val image = ImageText("https://example.com/image.jpg", alt = "An image")
-    assertThat(image.source { readUtf8() }).isEqualTo(
+    val image = buildImageText("https://example.com/image.jpg", alt = "An image")
+    assertThat(image).isEqualTo(
       "<img " +
         "src=\"https://example.com/image.jpg\" " +
         "alt=\"An image\" " +
@@ -40,12 +39,12 @@ class ImageTest {
   }
 
   @Test fun urlSizeAndAlt() {
-    val image = ImageText(
+    val image = buildImageText(
       "https://example.com/image.jpg",
       size = FixedSize(100, 200),
       alt = "An image",
     )
-    assertThat(image.source { readUtf8() }).isEqualTo(
+    assertThat(image).isEqualTo(
       "<img " +
         "src=\"https://example.com/image.jpg\" " +
         "width=\"100\" height=\"200\" " +

@@ -70,8 +70,5 @@ public suspend fun markdown(
   return buildString {
     appendLine(root.draw(options))
     append(footnotes.draw(options))
-  }.also {
-    root.close()
-    footnotes.close()
   }
 }

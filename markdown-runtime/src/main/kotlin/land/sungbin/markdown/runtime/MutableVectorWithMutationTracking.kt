@@ -20,6 +20,4 @@ internal class MutableVectorWithMutationTracking<T>(
   private val onVectorMutated: () -> Unit,
 ) {
   inline fun add(element: T) = vector.add(element).also { onVectorMutated() }
-  inline fun clear() = if (vector.isNotEmpty()) vector.clear().also { onVectorMutated() } else Unit
-  inline fun forEach(block: (T) -> Unit) = vector.forEach(block)
 }

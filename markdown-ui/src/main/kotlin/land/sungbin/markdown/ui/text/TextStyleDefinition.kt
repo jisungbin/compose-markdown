@@ -9,30 +9,19 @@ package land.sungbin.markdown.ui.text
 
 import androidx.compose.runtime.Immutable
 import land.sungbin.markdown.runtime.MarkdownOptions
-import land.sungbin.markdown.ui.bufferCursor
-import okio.BufferedSink
 
 @Immutable
 public data class TextStyleDefinition(public val open: String, public val end: String = open) : TextTransformer {
-  override fun transform(options: MarkdownOptions, sink: BufferedSink): BufferedSink = sink.apply {
-    buffer.readAndWriteUnsafe(bufferCursor).use { cursor ->
-      val previousSize = cursor.resizeBuffer(buffer.size + open.length + end.length)
-      cursor.seek(0)
-      cursor.data!!.copyInto(
-        destination = cursor.data!!,
-        destinationOffset = open.length,
-        startIndex = cursor.start,
-        endIndex = previousSize.toInt(),
-      )
-      repeat(open.length) { offset ->
-        cursor.data!![cursor.start + offset] = open[offset].code.toByte()
+  override fun transform(options: MarkdownOptions, value: String): String =
+    value.toCharArray(
+      destination = CharArray(open.length + value.length + end.length),
+      destinationOffset = open.length,
+    )
+      .also { new ->
+        repeat(open.length) { new[it] = open[it] }
+        (open.length + value.length).let { pos -> repeat(end.length) { new[pos + it] = end[it] } }
       }
-      cursor.seek(cursor.buffer!!.size - end.length)
-      repeat(end.length) { offset ->
-        cursor.data!![cursor.start + offset] = end[offset].code.toByte()
-      }
-    }
-  }
+      .concatToString()
 
   public companion object {
     public val Bold: TextStyleDefinition = TextStyleDefinition("**")

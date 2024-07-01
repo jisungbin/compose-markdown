@@ -7,41 +7,36 @@
 
 package land.sungbin.markdown.ui.image
 
+import androidx.annotation.VisibleForTesting
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.NonRestartableComposable
 import land.sungbin.markdown.runtime.MarkdownComposable
 import land.sungbin.markdown.ui.modifier.Modifier
-import land.sungbin.markdown.ui.text.AbstractText
 import land.sungbin.markdown.ui.text.Text
 import land.sungbin.markdown.ui.unit.Size
 
-@PublishedApi
-internal class ImageText(
+@VisibleForTesting
+internal fun buildImageText(
   url: String,
   size: Size? = null,
   alt: String? = null,
-) : AbstractText() {
-  init {
-    sink {
-      writeUtf8("<img ")
-      writeUtf8("src=\"$url\" ")
-      if (size != null) {
-        val (width, height) = size
-        writeUtf8("width=\"$width\" height=\"$height\" ")
-      }
-      if (alt != null) writeUtf8("alt=\"$alt\" ")
-      writeUtf8("/>")
-    }
+): String = buildString {
+  append("<img ")
+  append("src=\"$url\" ")
+  if (size != null) {
+    val (width, height) = size
+    append("width=\"$width\" height=\"$height\" ")
   }
+  if (alt != null) append("alt=\"$alt\" ")
+  append("/>")
 }
 
-@Suppress("NOTHING_TO_INLINE")
 @[Composable NonRestartableComposable MarkdownComposable]
-public inline fun Image(
+public fun Image(
   url: String,
   size: Size? = null,
   alt: String? = null,
   modifier: Modifier = Modifier,
 ) {
-  Text(modifier = modifier, value = ImageText(url, size, alt))
+  Text(modifier = modifier, value = buildImageText(url, size, alt))
 }

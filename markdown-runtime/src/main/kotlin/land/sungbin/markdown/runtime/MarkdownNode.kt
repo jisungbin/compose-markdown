@@ -8,18 +8,15 @@
 package land.sungbin.markdown.runtime
 
 import androidx.compose.runtime.collection.MutableVector
-import okio.Buffer
-import okio.BufferedSource
-import okio.Closeable
 import org.jetbrains.annotations.TestOnly
 
 // TODO documentation
 public class MarkdownNode(
-  private val source: ((MarkdownOptions) -> BufferedSource)? = null,
+  private val source: ((MarkdownOptions) -> String)? = null,
   private val kind: MarkdownKind = MarkdownKind.TEXT,
   private val contentKind: MarkdownKind? = null,
   private val contentTag: ((index: Int, MarkdownOptions) -> String)? = null,
-) : Closeable, Cloneable {
+) {
   internal val children = MutableVectorWithMutationTracking(MutableVector<MarkdownNode>(capacity = 20)) {
     check(kind.layout) { "Children can be added only to a group or footnote node." }
   }
@@ -71,42 +68,39 @@ public class MarkdownNode(
     return contentTag!!.invoke(index, options)
   }
 
-  internal fun draw(options: MarkdownOptions): BufferedSource = Buffer().apply {
-    when {
-      text -> writeStringMarkdown(options)
-      group -> writeGroupMarkdown(options)
-      footnote -> writeFootnoteMarkdown(options)
-    }
+  internal fun draw(options: MarkdownOptions): String = when {
+    text -> drawStringMarkdown(options)
+    group -> drawGroupMarkdown(options)
+    footnote -> drawFootnoteMarkdown(options)
+    else -> runtimeError { "[draw] unreachable code: $kind" }
   }
 
-  private fun Buffer.writeStringMarkdown(options: MarkdownOptions) {
-    writeAll(source!!.invoke(options))
-  }
+  private fun drawStringMarkdown(options: MarkdownOptions): String =
+    source!!.invoke(options)
 
-  private fun Buffer.writeFootnoteMarkdown(options: MarkdownOptions) {
-    var tag: String? = null
-
-    children.forEach { child ->
-      if (tag == null) tag = tag(child.index, options)
-      val source = child.draw(options)
-      while (!source.exhausted()) {
-        val line = source.readUtf8Line() ?: break
-        writeUtf8(tag!!).writeUtf8(line).writeByte(NEW_LINE)
+  private fun drawFootnoteMarkdown(options: MarkdownOptions) = buildString {
+    var tag = tag(children.vector.firstOrNull()?.index ?: return@buildString, options)
+    children.vector.forEach { child ->
+      val source = child.draw(options).lineSequence()
+      for (line in source) {
+        append(tag).append(line).append(NEW_LINE)
         if (tag != FOOTNOTE_INDENT) tag = FOOTNOTE_INDENT
       }
     }
   }
 
-  private fun Buffer.writeGroupMarkdown(options: MarkdownOptions) {
-    children.forEach { child ->
-      val source = child.draw(options)
+  private fun drawGroupMarkdown(options: MarkdownOptions) = buildString {
+    val lastChildIndex = children.vector.lastIndex
+    children.vector.forEachIndexed { index, child ->
       val tag = tag(child.index, options)
       var touched = false
-      while (!source.exhausted()) {
-        val line = source.readUtf8Line() ?: break
+      val source = child.draw(options).lineSequence().iterator()
+      while (source.hasNext()) {
+        val line = source.next()
         val prefix = (contentKind!! + child.kind).prefix(tag = tag, forceConcat = !touched)
-        writeUtf8(prefix).writeUtf8(line).writeByte(NEW_LINE)
-        touched = true
+        append(prefix).append(line)
+        if (index != lastChildIndex || source.hasNext()) append(NEW_LINE)
+        if (!touched) touched = true
       }
     }
   }
@@ -118,19 +112,10 @@ public class MarkdownNode(
     else -> runtimeError { "[prefix] unreachable code: $this" }
   }
 
-  override fun toString(): String = clone().draw(MarkdownOptions.Default).readUtf8()
-
-  public override fun clone(): MarkdownNode = MarkdownNode(source, kind, contentKind, contentTag).also { clone ->
-    children.forEach { child -> clone.children.add(child) }
-  }
-
-  override fun close() {
-    children.forEach { it.close() }
-    children.clear()
-  }
+  override fun toString(): String = draw(MarkdownOptions.Default)
 
   private companion object {
-    private const val NEW_LINE = '\n'.code
+    private const val NEW_LINE = '\n'
     private const val FOOTNOTE_INDENT = "    "
   }
 }
