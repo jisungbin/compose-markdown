@@ -14,7 +14,7 @@ import org.jetbrains.annotations.TestOnly
 public class MarkdownNode(
   private val source: ((MarkdownOptions) -> String)? = null,
   private val kind: MarkdownKind = MarkdownKind.TEXT,
-  private val contentKind: MarkdownKind? = null,
+  private val contentKind: MarkdownKind = MarkdownKind.ANY,
   private val contentTag: ((index: Int, MarkdownOptions) -> String)? = null,
 ) {
   internal val children = MutableVectorWithMutationTracking(MutableVector<MarkdownNode>(capacity = 20)) {
@@ -28,7 +28,7 @@ public class MarkdownNode(
   @TestOnly internal constructor(
     children: List<MarkdownNode>,
     kind: MarkdownKind = MarkdownKind.GROUP,
-    contentKind: MarkdownKind,
+    contentKind: MarkdownKind = MarkdownKind.ANY,
     contentTag: (index: Int, MarkdownOptions) -> String,
   ) : this(kind = kind, contentKind = contentKind, contentTag = contentTag) {
     for (i in children.indices) {
@@ -47,7 +47,6 @@ public class MarkdownNode(
           "A node that is a group or a footnote cannot have its own 'source'. " +
             "Only children are allowed to be the source of a 'source'."
         }
-        if (group) require(contentKind != null) { "A node that is a group must have a 'contentKind'." }
         require(contentTag != null) { "A node that is a group or a footnote must have a 'contentTag'." }
       }
       false -> {
@@ -55,7 +54,7 @@ public class MarkdownNode(
           "A MarkdownNode has been emitted as a MarkdownKind.TEXT, but the 'source' is null. " +
             "Use a 'source' containing a markdown string instead of null."
         }
-        require(contentKind == null) { "A node that is not a group or a footnote cannot have a 'contentKind'." }
+        require(contentKind == MarkdownKind.ANY) { "A node that is not a group or a footnote cannot have a 'contentKind'." }
         require(contentTag == null) { "A node that is not a group or a footnote cannot have a 'contentTag'." }
       }
     }
@@ -97,7 +96,7 @@ public class MarkdownNode(
       val source = child.draw(options).lineSequence().iterator()
       while (source.hasNext()) {
         val line = source.next()
-        val prefix = (contentKind!! + child.kind).prefix(tag = tag, forceConcat = !touched)
+        val prefix = (contentKind + child.kind).prefix(tag = tag, forceConcat = !touched)
         append(prefix).append(line)
         if (index != lastChildIndex || source.hasNext()) append(NEW_LINE)
         if (!touched) touched = true

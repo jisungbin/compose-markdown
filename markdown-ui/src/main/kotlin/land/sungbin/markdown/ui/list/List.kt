@@ -25,7 +25,6 @@ public inline fun List(
     factory = {
       MarkdownNode(
         kind = MarkdownKind.GROUP,
-        contentKind = MarkdownKind.ANY,
         contentTag = { index, _ -> if (ordered) "${index + 1}. " else "- " },
       )
     },

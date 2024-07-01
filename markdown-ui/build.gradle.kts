@@ -12,6 +12,9 @@ plugins {
 
 kotlin {
   explicitApi()
+  sourceSets.all {
+    languageSettings.enableLanguageFeature("ExplicitBackingFields")
+  }
 }
 
 dependencies {
