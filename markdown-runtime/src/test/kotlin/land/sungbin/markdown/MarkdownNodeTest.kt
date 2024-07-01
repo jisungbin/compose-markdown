@@ -56,11 +56,6 @@ class MarkdownNodeTest {
       )
   }
 
-  @Test fun groupNodeShouldHaveContentKind() {
-    assertFailure { node = MarkdownNode(kind = MarkdownKind.GROUP, contentTag = { _, _ -> "" }) }
-      .hasMessage("A node that is a group must have a 'contentKind'.")
-  }
-
   @Test fun layoutNodeShouldHaveContentTag() {
     assertFailure { node = MarkdownNode(kind = MarkdownKind.GROUP, contentKind = MarkdownKind.TEXT) }
       .hasMessage("A node that is a group or a footnote must have a 'contentTag'.")
@@ -88,7 +83,6 @@ class MarkdownNodeTest {
         MarkdownNode(source = { worldSource2 }),
       ),
       kind = MarkdownKind.FOOTNOTE,
-      contentKind = MarkdownKind.ANY,
       contentTag = { _, _ -> "[^T]: " },
     )
 
@@ -156,7 +150,6 @@ class MarkdownNodeTest {
           .apply { index = actualIndex }
       },
       kind = MarkdownKind.GROUP + MarkdownKind.REPEATATION_PARENT_TAG,
-      contentKind = MarkdownKind.ANY,
       contentTag = { index, _ -> "${index + 1}. " },
     )
     val childrenNodes = MarkdownNode(
@@ -175,7 +168,6 @@ class MarkdownNodeTest {
         childrenNodes,
       ),
       kind = MarkdownKind.GROUP,
-      contentKind = MarkdownKind.ANY,
       contentTag = { _, _ -> "" },
     )
 

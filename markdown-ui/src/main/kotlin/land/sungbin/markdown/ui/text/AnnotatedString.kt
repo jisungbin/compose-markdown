@@ -13,7 +13,9 @@ import androidx.compose.ui.util.fastFold
 import land.sungbin.markdown.runtime.MarkdownOptions
 
 @Immutable
-public class AnnotatedString(@Suppress("MemberVisibilityCanBePrivate") public val styledTexts: List<TextAndStyle>) : CharSequence {
+public class AnnotatedString(
+  @Suppress("MemberVisibilityCanBePrivate") public val styledTexts: List<TextAndStyle>,
+) : CharSequence {
   private val backing = run {
     styledTexts
       .fastFold(StringBuilder()) { acc, (text, style) ->
@@ -37,7 +39,6 @@ public class AnnotatedString(@Suppress("MemberVisibilityCanBePrivate") public va
   }
 
   override fun hashCode(): Int = backing.hashCode()
-
   override fun toString(): String = backing
 
   @Immutable

@@ -14,53 +14,127 @@ import kotlin.test.Test
 import land.sungbin.markdown.ui.text.TextTransformer
 
 class ModifierTest {
-  @Test fun modifierChaining() {
-    val modifier = Modifier
-      .then(testModifier1)
-      .then(testModifier2)
-      .then(testModifier3)
-      .then(testModifier4)
+  private val testTransformer = TextTransformer { _, value -> value }
+  private val testTransformer2 = TextTransformer { _, value -> value }
+  private val testTransformer3 = TextTransformer { _, value -> value }
+  private val testTransformer4 = TextTransformer { _, sink -> sink }
 
-    assertThat(modifier.toList()).containsExactly(
-      testModifier1,
-      testModifier2,
-      testModifier3,
-      testModifier4,
+  private val testFootnote = FootnoteGroup(tag = "1", content = {})
+  private val testFootnote2 = FootnoteGroup(tag = "2", content = {})
+  private val testFootnote3 = FootnoteGroup(tag = "3", content = {})
+  private val testFootnote4 = FootnoteGroup(tag = "4", content = {})
+
+  @Test fun transformerChaining() {
+    val modifier = Modifier
+      .then(testTransformer)
+      .then(testTransformer2)
+      .then(testTransformer3)
+      .then(testTransformer4)
+
+    assertThat(modifier.transformers()).containsExactly(
+      testTransformer,
+      testTransformer2,
+      testTransformer3,
+      testTransformer4,
     )
   }
 
-  @Test fun multiModifierChaining() {
+  @Test fun multiTransformerChaining() {
     val modifierChain1 = Modifier
-      .then(testModifier1)
-      .then(testModifier2)
-      .then(testModifier3)
-      .then(testModifier4)
+      .then(testTransformer)
+      .then(testTransformer2)
+      .then(testTransformer3)
+      .then(testTransformer4)
     val modifierChain2 = Modifier
-      .then(testModifier4)
-      .then(testModifier1)
-      .then(testModifier3)
-      .then(testModifier2)
+      .then(testTransformer4)
+      .then(testTransformer)
+      .then(testTransformer3)
+      .then(testTransformer2)
 
-    assertThat(modifierChain1.toList()).containsExactly(
-      testModifier1,
-      testModifier2,
-      testModifier3,
-      testModifier4,
+    assertThat(modifierChain1.transformers()).containsExactly(
+      testTransformer,
+      testTransformer2,
+      testTransformer3,
+      testTransformer4,
     )
-    assertThat(modifierChain2.toList()).containsExactly(
-      testModifier4,
-      testModifier1,
-      testModifier3,
-      testModifier2,
+    assertThat(modifierChain2.transformers()).containsExactly(
+      testTransformer4,
+      testTransformer,
+      testTransformer3,
+      testTransformer2,
+    )
+  }
+
+  @Test fun footnoteChaining() {
+    val modifier = Modifier
+      .with(testFootnote)
+      .with(testFootnote2)
+      .with(testFootnote3)
+      .with(testFootnote4)
+
+    assertThat(modifier.footnotes()).containsExactly(
+      testFootnote,
+      testFootnote2,
+      testFootnote3,
+      testFootnote4,
+    )
+  }
+
+  @Test fun multiFootnoteChaining() {
+    val modifierChain1 = Modifier
+      .with(testFootnote)
+      .with(testFootnote2)
+      .with(testFootnote3)
+      .with(testFootnote4)
+    val modifierChain2 = Modifier
+      .with(testFootnote4)
+      .with(testFootnote)
+      .with(testFootnote3)
+      .with(testFootnote2)
+
+    assertThat(modifierChain1.footnotes()).containsExactly(
+      testFootnote,
+      testFootnote2,
+      testFootnote3,
+      testFootnote4,
+    )
+    assertThat(modifierChain2.footnotes()).containsExactly(
+      testFootnote4,
+      testFootnote,
+      testFootnote3,
+      testFootnote2,
+    )
+  }
+
+  @Test fun mixedChaining() {
+    val modifier = Modifier
+      .then(testTransformer)
+      .with(testFootnote)
+      .then(testTransformer2)
+      .with(testFootnote2)
+      .then(testTransformer3)
+      .with(testFootnote3)
+      .then(testTransformer4)
+      .with(testFootnote4)
+
+    assertThat(modifier.transformers()).containsExactly(
+      testTransformer,
+      testTransformer2,
+      testTransformer3,
+      testTransformer4,
+    )
+    assertThat(modifier.footnotes()).containsExactly(
+      testFootnote,
+      testFootnote2,
+      testFootnote3,
+      testFootnote4,
     )
   }
 
   @Test fun emptyModifierIsSame() {
     assertThat(Modifier).isSameInstanceAs(Modifier)
   }
-
-  private val testModifier1 = TextTransformer { _, sink -> sink }
-  private val testModifier2 = TextTransformer { _, sink -> sink }
-  private val testModifier3 = TextTransformer { _, sink -> sink }
-  private val testModifier4 = TextTransformer { _, sink -> sink }
 }
+
+private fun Modifier.transformers() = (this as MutableModifier).transformers
+private fun Modifier.footnotes() = (this as MutableModifier).footnotes
