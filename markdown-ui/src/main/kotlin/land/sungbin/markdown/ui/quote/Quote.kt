@@ -23,7 +23,7 @@ public inline fun Quote(content: @Composable @MarkdownComposable () -> Unit) {
       MarkdownNode(
         kind = MarkdownKind.GROUP,
         contentKind = MarkdownKind.REPEATATION_PARENT_TAG,
-        contentTag = { _, _ -> "> " },
+        contentTag = { "> " },
       )
     },
     update = EmptyUpdater,

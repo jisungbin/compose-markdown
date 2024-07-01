@@ -12,7 +12,6 @@ import assertk.assertThat
 import assertk.assertions.hasMessage
 import assertk.assertions.isEqualTo
 import kotlin.test.Test
-import land.sungbin.markdown.ui.transform
 
 class TextStyleTest {
   @Test fun multipleUppercaseStyled() {

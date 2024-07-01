@@ -14,10 +14,10 @@ import kotlin.test.Test
 import land.sungbin.markdown.ui.text.TextTransformer
 
 class ModifierTest {
-  private val testTransformer = TextTransformer { _, value -> value }
-  private val testTransformer2 = TextTransformer { _, value -> value }
-  private val testTransformer3 = TextTransformer { _, value -> value }
-  private val testTransformer4 = TextTransformer { _, sink -> sink }
+  private val testTransformer = TextTransformer { it }
+  private val testTransformer2 = TextTransformer { it }
+  private val testTransformer3 = TextTransformer { it }
+  private val testTransformer4 = TextTransformer { it }
 
   private val testFootnote = FootnoteGroup(tag = "1", content = {})
   private val testFootnote2 = FootnoteGroup(tag = "2", content = {})

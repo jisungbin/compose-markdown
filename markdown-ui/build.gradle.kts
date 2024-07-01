@@ -19,7 +19,6 @@ kotlin {
 
 dependencies {
   implementation(libs.compose.runtime)
-  implementation(libs.compose.uiutil)
   implementation(libs.androidx.annotation)
 
   implementation(projects.markdownRuntime)

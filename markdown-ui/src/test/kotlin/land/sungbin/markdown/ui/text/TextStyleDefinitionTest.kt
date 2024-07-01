@@ -10,7 +10,6 @@ package land.sungbin.markdown.ui.text
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import kotlin.test.Test
-import land.sungbin.markdown.ui.transform
 
 class TextStyleDefinitionTest {
   @Test fun bold() {

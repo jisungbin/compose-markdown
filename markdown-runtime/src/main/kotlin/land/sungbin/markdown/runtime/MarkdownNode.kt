@@ -12,10 +12,10 @@ import org.jetbrains.annotations.TestOnly
 
 // TODO documentation
 public class MarkdownNode(
-  private val source: ((MarkdownOptions) -> String)? = null,
+  private val value: String? = null,
   private val kind: MarkdownKind = MarkdownKind.TEXT,
   private val contentKind: MarkdownKind = MarkdownKind.ANY,
-  private val contentTag: ((index: Int, MarkdownOptions) -> String)? = null,
+  private val contentTag: ((index: Int) -> String)? = null,
 ) {
   internal val children = MutableVectorWithMutationTracking(MutableVector<MarkdownNode>(capacity = 20)) {
     check(kind.layout) { "Children can be added only to a group or footnote node." }
@@ -29,7 +29,7 @@ public class MarkdownNode(
     children: List<MarkdownNode>,
     kind: MarkdownKind = MarkdownKind.GROUP,
     contentKind: MarkdownKind = MarkdownKind.ANY,
-    contentTag: (index: Int, MarkdownOptions) -> String,
+    contentTag: (index: Int) -> String,
   ) : this(kind = kind, contentKind = contentKind, contentTag = contentTag) {
     for (i in children.indices) {
       this.children.add(children[i])
@@ -43,16 +43,16 @@ public class MarkdownNode(
 
     when (kind.layout) {
       true -> {
-        require(source == null) {
-          "A node that is a group or a footnote cannot have its own 'source'. " +
-            "Only children are allowed to be the source of a 'source'."
+        require(value == null) {
+          "A node that is a group or a footnote cannot have its own 'value'. " +
+            "Only children are allowed to be the source of a 'value'."
         }
         require(contentTag != null) { "A node that is a group or a footnote must have a 'contentTag'." }
       }
       false -> {
-        require(source != null) {
-          "A MarkdownNode has been emitted as a MarkdownKind.TEXT, but the 'source' is null. " +
-            "Use a 'source' containing a markdown string instead of null."
+        require(value != null) {
+          "A MarkdownNode has been emitted as a MarkdownKind.TEXT, but the 'value' is null. " +
+            "Use a 'value' producing a markdown string instead of null."
         }
         require(contentKind == MarkdownKind.ANY) { "A node that is not a group or a footnote cannot have a 'contentKind'." }
         require(contentTag == null) { "A node that is not a group or a footnote cannot have a 'contentTag'." }
@@ -62,25 +62,24 @@ public class MarkdownNode(
 
   internal var index = 0
 
-  private fun tag(index: Int, options: MarkdownOptions): String {
+  private fun tag(index: Int): String {
     runtimeCheck(kind.layout) { "A node that is not a group or a footnote cannot have a tag." }
-    return contentTag!!.invoke(index, options)
+    return contentTag!!.invoke(index)
   }
 
-  internal fun draw(options: MarkdownOptions): String = when {
-    text -> drawStringMarkdown(options)
-    group -> drawGroupMarkdown(options)
-    footnote -> drawFootnoteMarkdown(options)
+  internal fun draw(): String = when {
+    text -> drawText()
+    group -> drawGroup()
+    footnote -> drawFootnote()
     else -> runtimeError { "[draw] unreachable code: $kind" }
   }
 
-  private fun drawStringMarkdown(options: MarkdownOptions): String =
-    source!!.invoke(options)
+  private fun drawText(): String = value!!
 
-  private fun drawFootnoteMarkdown(options: MarkdownOptions) = buildString {
-    var tag = tag(children.vector.firstOrNull()?.index ?: return@buildString, options)
+  private fun drawFootnote() = buildString {
+    var tag = tag(children.vector.firstOrNull()?.index ?: return@buildString)
     children.vector.forEach { child ->
-      val source = child.draw(options).lineSequence()
+      val source = child.draw().lineSequence()
       for (line in source) {
         append(tag).append(line).append(NEW_LINE)
         if (tag != FOOTNOTE_INDENT) tag = FOOTNOTE_INDENT
@@ -88,12 +87,12 @@ public class MarkdownNode(
     }
   }
 
-  private fun drawGroupMarkdown(options: MarkdownOptions) = buildString {
+  private fun drawGroup() = buildString {
     val lastChildIndex = children.vector.lastIndex
     children.vector.forEachIndexed { index, child ->
-      val tag = tag(child.index, options)
+      val tag = tag(child.index)
       var touched = false
-      val source = child.draw(options).lineSequence().iterator()
+      val source = child.draw().lineSequence().iterator()
       while (source.hasNext()) {
         val line = source.next()
         val prefix = (contentKind + child.kind).prefix(tag = tag, forceConcat = !touched)
@@ -111,7 +110,7 @@ public class MarkdownNode(
     else -> runtimeError { "[prefix] unreachable code: $this" }
   }
 
-  override fun toString(): String = draw(MarkdownOptions.Default)
+  override fun toString(): String = "[MarkdownNode: ${draw()}]"
 
   private companion object {
     private const val NEW_LINE = '\n'

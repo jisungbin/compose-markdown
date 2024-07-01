@@ -9,7 +9,6 @@ package land.sungbin.markdown.ui.modifier
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
-import land.sungbin.markdown.runtime.MarkdownOptions
 import land.sungbin.markdown.ui.text.TextTransformer
 
 private val DefaultClickableRange: (String) -> IntRange = { 0..it.length }
@@ -23,7 +22,7 @@ public class ClickableTransformer(
   private val link: String,
   private val range: (String) -> IntRange,
 ) : TextTransformer {
-  override fun transform(options: MarkdownOptions, value: String): String {
+  override fun transform(value: String): String {
     val originalLength = value.length
     val linkLength = link.length
     val replacementRange = range(value)

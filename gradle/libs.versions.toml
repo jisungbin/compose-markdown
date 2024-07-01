@@ -26,7 +26,6 @@ kotlin-gradle = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.
 kotlin-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlin-coroutines" }
 
 compose-runtime = { module = "androidx.compose.runtime:runtime", version.ref = "compose-runtime" }
-compose-uiutil = { module = "androidx.compose.ui:ui-util", version.ref = "compose-runtime" }
 
 androidx-annotation = { module = "androidx.annotation:annotation", version.ref = "androidx-annotation" }
 

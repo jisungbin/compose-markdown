@@ -8,8 +8,6 @@
 package land.sungbin.markdown.ui.modifier
 
 import androidx.compose.runtime.Stable
-import androidx.compose.ui.util.fastFold
-import land.sungbin.markdown.runtime.MarkdownOptions
 import land.sungbin.markdown.ui.text.TextTransformer
 
 @Stable
@@ -68,7 +66,7 @@ internal infix fun Modifier.with(footnote: FootnoteGroup): Modifier {
   return (this as MutableModifier).apply { add(footnote) }
 }
 
-internal fun Modifier.applyTo(options: MarkdownOptions, value: String): String {
+internal fun Modifier.applyTo(value: String): String {
   if (this !is MutableModifier) return value
-  return transformers.fastFold(value) { acc, transformer -> transformer.transform(options, acc) }
+  return transformers.fold(value) { acc, transformer -> transformer.transform(acc) }
 }
