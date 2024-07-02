@@ -1,6 +1,6 @@
 ## Compose Markdown
 
-Build markdown with Jetpack Compose _[runtime_](https://developer.android.com/jetpack/androidx/releases/compose-runtime).[^UI]
+Build markdown with Jetpack Compose [_runtime_](https://developer.android.com/jetpack/androidx/releases/compose-runtime).[^UI]
 
 > This README is made with Composable! Check out the [sample](/sample/src/main/kotlin/main.kt).
 
