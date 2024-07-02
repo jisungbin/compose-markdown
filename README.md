@@ -1,6 +1,6 @@
 ## Compose Markdown
 
-Build markdown with Jetpack Compose [_runtime_](https://developer.android.com/jetpack/androidx/releases/compose-runtime).[^UI]
+Build markdown with Jetpack Compose [_runtime_](https://developer.android.com/jetpack/androidx/releases/compose-runtime)[^UI].
 
 > This README is made with Composable! Check out the [sample](/sample/src/main/kotlin/main.kt).
 
@@ -8,7 +8,7 @@ Build markdown with Jetpack Compose [_runtime_](https://developer.android.com/je
 
 Jetpack Compose is often known as a UI toolkit, but it is actually a library providing excellent 
 node traversal implementation. This repository creates our own Compose UI that produces Markdown 
-strings using only Compose's Runtime features.
+strings using only Compose's runtime features.
 
 This development began with the purpose of learning Compose Runtime and has been made public to 
 spread the value of the Compose Runtime.
