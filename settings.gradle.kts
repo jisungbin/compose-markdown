@@ -36,4 +36,5 @@ dependencyResolutionManagement {
 include(
   ":markdown-runtime",
   ":markdown-ui",
+  ":sample",
 )

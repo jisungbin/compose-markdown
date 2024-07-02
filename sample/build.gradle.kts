@@ -11,19 +11,11 @@ plugins {
 }
 
 kotlin {
-  explicitApi()
   sourceSets.all {
     languageSettings.enableLanguageFeature("ExplicitBackingFields")
   }
 }
 
 dependencies {
-  implementation(libs.compose.runtime)
-  implementation(libs.androidx.annotation)
-
-  api(projects.markdownRuntime)
-
-  testImplementation(kotlin("test-junit5"))
-  testImplementation(libs.test.assertk)
-  testImplementation(libs.test.kotlin.coroutines)
+  implementation(projects.markdownUi)
 }

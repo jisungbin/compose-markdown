@@ -16,7 +16,7 @@ kotlin {
 
 dependencies {
   implementation(libs.androidx.annotation)
-  implementation(libs.compose.runtime)
+  api(libs.compose.runtime)
 
   api(libs.kotlin.coroutines)
 
