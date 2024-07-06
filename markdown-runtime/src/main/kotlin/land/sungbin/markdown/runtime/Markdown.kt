@@ -68,13 +68,13 @@ public suspend fun markdown(
       when {
         child.footnote -> footnotes += child.draw()
         else -> {
-          if (!isEmpty()) append('\n')
+          if (isNotEmpty()) append('\n')
           append(child.draw())
         }
       }
     }
     if (footnotes.isNotEmpty()) {
-      if (!isEmpty()) append("\n\n")
+      if (isNotEmpty()) append("\n\n")
       append(footnotes.joinToString("\n"))
     }
   }
