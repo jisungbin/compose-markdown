@@ -22,18 +22,18 @@ public sealed interface Modifier {
 }
 
 internal class MutableModifier : Modifier {
-  val transformers: List<TextTransformer>
-    field = ArrayList()
+  private val _transformers = mutableListOf<TextTransformer>()
+  val transformers: List<TextTransformer> get() = _transformers
 
-  val footnotes: List<FootnoteGroup>
-    field = ArrayList()
+  private val _footnotes = mutableListOf<FootnoteGroup>()
+  val footnotes: List<FootnoteGroup> get() = _footnotes
 
   fun add(transformer: TextTransformer) {
-    transformers.add(transformer)
+    _transformers.add(transformer)
   }
 
   fun add(footnote: FootnoteGroup) {
-    footnotes.add(footnote)
+    _footnotes.add(footnote)
   }
 
   override fun hashCode(): Int {
