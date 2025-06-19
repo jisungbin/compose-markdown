@@ -8,7 +8,7 @@ kotlin-core = "2.1.21"
 kotlin-dokka = "1.9.20"
 kotlin-coroutines = "1.10.2" # K2
 
-compose-runtime = "1.8.2"
+compose-runtime = "1.8.3"
 androidx-annotation = "1.9.1"
 
 test-assertk = "0.28.1"
